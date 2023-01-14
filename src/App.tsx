@@ -24,9 +24,17 @@ function App() {
     setGarage(data);
   }
 
+  function handlePagination(page: number) {
+    let newPage = page;
+    if (newPage < 1) newPage = 1;
+    if (newPage > Math.ceil(Number(totalCars)) / 7) newPage = Math.ceil(Number(totalCars) / 7);
+    setCurrentPage(newPage);
+  }
+
   useEffect(() => {
+    handlePagination(currentPage);
     getGarage();
-  }, [currentPage]);
+  }, [currentPage, totalCars]);
 
   async function createNewCar(carName = '', carColor = '') {
     await fetch(`${BASE_URL}/garage`, {
@@ -45,14 +53,13 @@ function App() {
     event.preventDefault();
     createNewCar(newCarName, newCarColor);
     getGarage();
-    console.log('create', newCarName, newCarColor);
   }
 
-  function handlePagination(page: number) {
-    let newPage = page;
-    if (newPage < 1) newPage = 1;
-    if (newPage > Number(totalCars) / 7) newPage = Math.ceil(Number(totalCars) / 7);
-    setCurrentPage(newPage);
+  async function handleDeleteCar(id: number) {
+    await fetch(`${BASE_URL}/garage/${id}`, {
+      method: 'DELETE',
+    });
+    getGarage();
   }
 
   return (
@@ -89,7 +96,13 @@ function App() {
         <div>Race track</div>
         <div>Total cars from length: {garage.length}</div>
         <div>Total cars from header: {totalCars}</div>
-        {garage.map((car) => <div style={{ color: car.color }}>{car.id} {car.name} {car.color}</div>)}
+        {garage.map((car) => (
+          <>
+            <div style={{ color: car.color }}>{car.id} {car.name} {car.color}</div>
+            <button type="button">edit</button>
+            <button type="button" onClick={() => handleDeleteCar(car.id)}>delete</button>
+          </>
+        ))}
         <div>pagination
           <button type="button" onClick={() => handlePagination(currentPage - 1)}> - </button>
           <span>{currentPage}</span>
