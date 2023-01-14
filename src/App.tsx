@@ -14,9 +14,10 @@ function App() {
   const [totalCars, setTotalCars] = useState('0');
   const [newCarName, setNewCarName] = useState('');
   const [newCarColor, setNewCarColor] = useState('#000000');
+  const [currentPage, setCurrentPage] = useState(1);
 
   async function getGarage() {
-    const response = await fetch(`${BASE_URL}/garage?_limit=7`);
+    const response = await fetch(`${BASE_URL}/garage?_page=${currentPage}&_limit=7`);
     const totalCarsInHeader = response.headers.get('X-Total-Count');
     if (totalCarsInHeader) setTotalCars(totalCarsInHeader);
     const data = await response.json();
@@ -25,7 +26,7 @@ function App() {
 
   useEffect(() => {
     getGarage();
-  }, []);
+  }, [currentPage]);
 
   async function createNewCar(carName = '', carColor = '') {
     await fetch(`${BASE_URL}/garage`, {
@@ -45,6 +46,13 @@ function App() {
     createNewCar(newCarName, newCarColor);
     getGarage();
     console.log('create', newCarName, newCarColor);
+  }
+
+  function handlePagination(page: number) {
+    let newPage = page;
+    if (newPage < 1) newPage = 1;
+    if (newPage > Number(totalCars) / 7) newPage = Math.ceil(Number(totalCars) / 7);
+    setCurrentPage(newPage);
   }
 
   return (
@@ -82,6 +90,11 @@ function App() {
         <div>Total cars from length: {garage.length}</div>
         <div>Total cars from header: {totalCars}</div>
         {garage.map((car) => <div style={{ color: car.color }}>{car.id} {car.name} {car.color}</div>)}
+        <div>pagination
+          <button type="button" onClick={() => handlePagination(currentPage - 1)}> - </button>
+          <span>{currentPage}</span>
+          <button type="button" onClick={() => handlePagination(currentPage + 1)}> + </button>
+        </div>
       </div>
 
       <div>Score tab</div>
