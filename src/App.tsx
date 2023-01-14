@@ -41,6 +41,10 @@ function App() {
     setEditCar(undefined);
   }, [currentPage, totalCars]);
 
+  function generateRandomColor() {
+    return Math.floor(Math.random() * 16777215).toString(16);
+  }
+
   async function createNewCar(carName: string, carColor: string) {
     await fetch(`${BASE_URL}/garage`, {
       method: 'POST',
@@ -53,6 +57,7 @@ function App() {
       }),
     });
     setNewCarName('');
+    setNewCarColor(`#${generateRandomColor()}`);
   }
 
   function onSubmitCreateHandler(event: React.FormEvent<HTMLFormElement>) {
@@ -138,8 +143,7 @@ function App() {
         <button type="button">generate cars</button>
 
         <div>Race track</div>
-        <div>Total cars from length: {garage.length}</div>
-        <div>Total cars from header: {totalCars}</div>
+        <div>Total cars: {totalCars}</div>
         {garage.map((car) => (
           <>
             <div style={{ color: car.color }}>{car.id} {car.name} {car.color}</div>
