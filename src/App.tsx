@@ -3,17 +3,20 @@ import styles from './App.module.scss';
 
 const BASE_URL = 'http://127.0.0.1:3000';
 
-type TCars = {
+type TCar = {
   name: string;
   color: string;
   id: number;
 }
 
 function App() {
-  const [garage, setGarage] = useState<TCars[]>([]);
+  const [garage, setGarage] = useState<TCar[]>([]);
   const [totalCars, setTotalCars] = useState('0');
   const [newCarName, setNewCarName] = useState('');
   const [newCarColor, setNewCarColor] = useState('#000000');
+  const [editCar, setEditCar] = useState<TCar>();
+  const [editCarName, setEditCarName] = useState('');
+  const [editCarColor, setEditCarColor] = useState('#000000');
   const [currentPage, setCurrentPage] = useState(1);
 
   async function getGarage() {
@@ -34,19 +37,22 @@ function App() {
   useEffect(() => {
     handlePagination(currentPage);
     getGarage();
+    setEditCarName('');
+    setEditCar(undefined);
   }, [currentPage, totalCars]);
 
-  async function createNewCar(carName = '', carColor = '') {
+  async function createNewCar(carName: string, carColor: string) {
     await fetch(`${BASE_URL}/garage`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: carName,
+        name: carName === '' ? 'Unnamed car' : carName,
         color: carColor,
       }),
     });
+    setNewCarName('');
   }
 
   function onSubmitCreateHandler(event: React.FormEvent<HTMLFormElement>) {
@@ -54,6 +60,36 @@ function App() {
     createNewCar(newCarName, newCarColor);
     getGarage();
   }
+
+  async function updateCar(car: TCar) {
+    await fetch(`${BASE_URL}/garage/${car.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: editCarName === '' ? 'Unnamed car' : editCarName,
+        color: editCarColor,
+      }),
+    });
+    setEditCarName('');
+    setEditCar(undefined);
+  }
+
+  function onSubmitUpdateHandler(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (editCar) {
+      updateCar(editCar);
+    }
+    getGarage();
+  }
+
+  useEffect(() => {
+    if (editCar) {
+      setEditCarName(editCar.name);
+      setEditCarColor(editCar.color);
+    }
+  }, [editCar]);
 
   async function handleDeleteCar(id: number) {
     await fetch(`${BASE_URL}/garage/${id}`, {
@@ -84,10 +120,18 @@ function App() {
           />
           <button type="submit">create</button>
         </form>
-        <form>
-          <input type="text" name="" id="" />
-          <input type="color" name="" id="" />
-          <button type="button">update</button>
+        <form onSubmit={onSubmitUpdateHandler}>
+          <input
+            placeholder=""
+            value={editCarName}
+            onChange={(event) => setEditCarName(event.target.value)}
+          />
+          <input
+            type="color"
+            value={editCarColor}
+            onChange={(event) => setEditCarColor(event.target.value)}
+          />
+          <button type="submit">update</button>
         </form>
         <button type="button">race</button>
         <button type="button">reset</button>
@@ -99,7 +143,7 @@ function App() {
         {garage.map((car) => (
           <>
             <div style={{ color: car.color }}>{car.id} {car.name} {car.color}</div>
-            <button type="button">edit</button>
+            <button type="button" onClick={() => setEditCar(car)}>edit</button>
             <button type="button" onClick={() => handleDeleteCar(car.id)}>delete</button>
           </>
         ))}
