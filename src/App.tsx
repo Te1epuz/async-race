@@ -12,6 +12,8 @@ type TCars = {
 function App() {
   const [garage, setGarage] = useState<TCars[]>([]);
   const [totalCars, setTotalCars] = useState('0');
+  const [newCarName, setNewCarName] = useState('');
+  const [newCarColor, setNewCarColor] = useState('#000000');
 
   async function getGarage() {
     const response = await fetch(`${BASE_URL}/garage?_limit=7`);
@@ -25,6 +27,26 @@ function App() {
     getGarage();
   }, []);
 
+  async function createNewCar(carName = '', carColor = '') {
+    await fetch(`${BASE_URL}/garage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: carName,
+        color: carColor,
+      }),
+    });
+  }
+
+  function onSubmitCreateHandler(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    createNewCar(newCarName, newCarColor);
+    getGarage();
+    console.log('create', newCarName, newCarColor);
+  }
+
   return (
     <div className={styles.wrapper}>
       <header className={styles.header}>
@@ -34,10 +56,18 @@ function App() {
       </header>
       <div>
         Garage
-        <form>
-          <input type="text" name="" id="" />
-          <input type="color" name="" id="" />
-          <button type="button">create</button>
+        <form onSubmit={onSubmitCreateHandler}>
+          <input
+            placeholder="enter new car name"
+            value={newCarName}
+            onChange={(event) => setNewCarName(event.target.value)}
+          />
+          <input
+            type="color"
+            value={newCarColor}
+            onChange={(event) => setNewCarColor(event.target.value)}
+          />
+          <button type="submit">create</button>
         </form>
         <form>
           <input type="text" name="" id="" />
