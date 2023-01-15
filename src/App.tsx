@@ -29,8 +29,8 @@ function App() {
 
   function handlePagination(page: number) {
     let newPage = page;
-    if (newPage < 1) newPage = 1;
     if (newPage > Math.ceil(Number(totalCars)) / 7) newPage = Math.ceil(Number(totalCars) / 7);
+    if (newPage < 1) newPage = 1;
     setCurrentPage(newPage);
   }
 
@@ -39,10 +39,11 @@ function App() {
     getGarage();
     setEditCarName('');
     setEditCar(undefined);
+    console.log(111);
   }, [currentPage, totalCars]);
 
   function generateRandomColor() {
-    return Math.floor(Math.random() * 16777215).toString(16);
+    return Math.random().toString(16).slice(2, 8).toUpperCase();
   }
 
   async function createNewCar(carName: string, carColor: string) {
@@ -146,10 +147,12 @@ function App() {
         <div>Total cars: {totalCars}</div>
         {garage.map((car) => (
           <>
-            <div>{car.id} {car.name} </div>
+            <div>{car.id} {car.name} {car.color}</div>
             <div className={styles.car} style={{ backgroundColor: car.color }} />
             <button type="button" onClick={() => setEditCar(car)}>edit</button>
             <button type="button" onClick={() => handleDeleteCar(car.id)}>delete</button>
+            <button type="button">start</button>
+            <button type="button">stop</button>
           </>
         ))}
         <div>pagination
