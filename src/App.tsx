@@ -146,7 +146,8 @@ function App() {
         <div>Total cars: {totalCars}</div>
         {garage.map((car) => (
           <>
-            <div style={{ color: car.color }}>{car.id} {car.name} {car.color}</div>
+            <div>{car.id} {car.name} </div>
+            <div className={styles.car} style={{ backgroundColor: car.color }} />
             <button type="button" onClick={() => setEditCar(car)}>edit</button>
             <button type="button" onClick={() => handleDeleteCar(car.id)}>delete</button>
           </>
