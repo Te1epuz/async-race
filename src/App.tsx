@@ -9,6 +9,10 @@ type TCar = {
   id: number;
 }
 
+type TCarsStatus = {
+  [index: number]: string;
+};
+
 function App() {
   const [garage, setGarage] = useState<TCar[]>([]);
   const [totalCars, setTotalCars] = useState('0');
@@ -18,6 +22,7 @@ function App() {
   const [editCarName, setEditCarName] = useState('');
   const [editCarColor, setEditCarColor] = useState('#000000');
   const [currentPage, setCurrentPage] = useState(1);
+  const [carsStatus, setCarsStatus] = useState<TCarsStatus>({});
 
   async function getGarage() {
     const response = await fetch(`${BASE_URL}/garage?_page=${currentPage}&_limit=7`);
@@ -34,20 +39,20 @@ function App() {
     setCurrentPage(newPage);
   }
 
-  function handleClick(event: MouseEvent) {
-    console.log(event.target);
-  }
+  // function handleClick(event: MouseEvent) {
+  //   console.log(event.target);
+  // }
 
   useEffect(() => {
-    window.addEventListener('click', handleClick);
+    console.log('useEffect proc');
+    // window.addEventListener('click', handleClick);
     handlePagination(currentPage);
     getGarage();
     setEditCarName('');
     setEditCar(undefined);
-    console.log(111);
-    return () => {
-      window.removeEventListener('click', handleClick);
-    };
+    // return () => {
+    //   window.removeEventListener('click', handleClick);
+    // };
   }, [currentPage, totalCars]);
 
   function generateRandomColor() {
@@ -55,7 +60,7 @@ function App() {
   }
 
   async function createNewCar(carName: string, carColor: string) {
-    await fetch(`${BASE_URL}/garage`, {
+    const response = await fetch(`${BASE_URL}/garage`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,8 +70,10 @@ function App() {
         color: carColor,
       }),
     });
+    const carData = await response.json();
     setNewCarName('');
     setNewCarColor(`#${generateRandomColor()}`);
+    setCarsStatus((prev) => ({ ...prev, [carData.id]: `${carData.id} status: engine off` }));
   }
 
   function onSubmitCreateHandler(event: React.FormEvent<HTMLFormElement>) {
@@ -109,7 +116,26 @@ function App() {
     await fetch(`${BASE_URL}/garage/${id}`, {
       method: 'DELETE',
     });
-    getGarage();
+    await getGarage();
+  }
+
+  async function switchToDrive(id: number) {
+    console.log('car switch to drive id', id);
+    setCarsStatus((prev) => ({ ...prev, [id]: `${prev[id]} driving...` }));
+    const response = await fetch(`${BASE_URL}/engine?id=${id}&status=drive`, {
+      method: 'PATCH',
+    });
+    switch (response.status) {
+      case 200:
+        setCarsStatus((prev) => ({ ...prev, [id]: `${prev[id]} finished!` }));
+        break;
+      case 500:
+        setCarsStatus((prev) => ({ ...prev, [id]: 'status: engine off!, car broken :(' }));
+        break;
+      default:
+        console.log(response.statusText);
+        break;
+    }
   }
 
   async function handleStartCar(id: number) {
@@ -118,9 +144,8 @@ function App() {
       method: 'PATCH',
     });
     const carData = await response.json();
-    console.log(carData);
-    (document.getElementById(`car_id_${id}`) as HTMLSpanElement).children[6].textContent =
-    `car status: ignition on, velocity: ${carData.velocity}`;
+    setCarsStatus((prev) => ({ ...prev, [id]: `status: engine on, velocity: ${carData.velocity}` }));
+    switchToDrive(id);
   }
 
   return (
@@ -172,7 +197,10 @@ function App() {
             <button type="button" onClick={() => handleDeleteCar(car.id)}>delete</button>
             <button type="button" onClick={() => handleStartCar(car.id)}>start</button>
             <button type="button">stop</button>
-            <span>car status: ignition off</span>
+            <span id={`car_id_${car.id}_info`}>{
+              carsStatus[car.id] ? carsStatus[car.id] : 'status: engine off'
+            }
+            </span>
           </div>
         ))}
         <div>pagination
