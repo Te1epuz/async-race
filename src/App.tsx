@@ -120,7 +120,6 @@ function App() {
   }
 
   async function switchToDrive(id: number) {
-    console.log('car switch to drive id', id);
     setCarsStatus((prev) => ({ ...prev, [id]: `${prev[id]} driving...` }));
     const response = await fetch(`${BASE_URL}/engine?id=${id}&status=drive`, {
       method: 'PATCH',
@@ -139,7 +138,6 @@ function App() {
   }
 
   async function handleStartCar(id: number) {
-    console.log('car start id', id);
     const response = await fetch(`${BASE_URL}/engine?id=${id}&status=started`, {
       method: 'PATCH',
     });
@@ -149,9 +147,9 @@ function App() {
   }
 
   async function handleStartAllCars() {
-    garage.forEach((car) => {
-      handleStartCar(car.id);
-    });
+    for (let id = 1; id <= Number(totalCars); id += 1) {
+      handleStartCar(id);
+    }
   }
 
   return (
