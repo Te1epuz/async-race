@@ -34,12 +34,20 @@ function App() {
     setCurrentPage(newPage);
   }
 
+  function handleClick(event: MouseEvent) {
+    console.log(event.target);
+  }
+
   useEffect(() => {
+    window.addEventListener('click', handleClick);
     handlePagination(currentPage);
     getGarage();
     setEditCarName('');
     setEditCar(undefined);
     console.log(111);
+    return () => {
+      window.removeEventListener('click', handleClick);
+    };
   }, [currentPage, totalCars]);
 
   function generateRandomColor() {
@@ -104,6 +112,17 @@ function App() {
     getGarage();
   }
 
+  async function handleStartCar(id: number) {
+    console.log('car start id', id);
+    const response = await fetch(`${BASE_URL}/engine?id=${id}&status=started`, {
+      method: 'PATCH',
+    });
+    const carData = await response.json();
+    console.log(carData);
+    (document.getElementById(`car_id_${id}`) as HTMLSpanElement).children[6].textContent =
+    `car status: ignition on, velocity: ${carData.velocity}`;
+  }
+
   return (
     <div className={styles.wrapper}>
       <header className={styles.header}>
@@ -146,14 +165,15 @@ function App() {
         <div>Race track</div>
         <div>Total cars: {totalCars}</div>
         {garage.map((car) => (
-          <>
+          <div id={`car_id_${car.id}`}>
             <div>{car.id} {car.name} {car.color}</div>
-            <div className={styles.car} style={{ backgroundColor: car.color }} />
+            <div className={styles.car__img} style={{ backgroundColor: car.color }} />
             <button type="button" onClick={() => setEditCar(car)}>edit</button>
             <button type="button" onClick={() => handleDeleteCar(car.id)}>delete</button>
-            <button type="button">start</button>
+            <button type="button" onClick={() => handleStartCar(car.id)}>start</button>
             <button type="button">stop</button>
-          </>
+            <span>car status: ignition off</span>
+          </div>
         ))}
         <div>pagination
           <button type="button" onClick={() => handlePagination(currentPage - 1)}> - </button>
