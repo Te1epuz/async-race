@@ -148,6 +148,12 @@ function App() {
     switchToDrive(id);
   }
 
+  async function handleStartAllCars() {
+    garage.forEach((car) => {
+      handleStartCar(car.id);
+    });
+  }
+
   return (
     <div className={styles.wrapper}>
       <header className={styles.header}>
@@ -183,7 +189,7 @@ function App() {
           />
           <button type="submit">update</button>
         </form>
-        <button type="button">race</button>
+        <button type="button" onClick={() => handleStartAllCars()}>race</button>
         <button type="button">reset</button>
         <button type="button">generate cars</button>
 
