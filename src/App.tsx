@@ -10,7 +10,10 @@ type TCar = {
 }
 
 type TCarsStatus = {
-  [index: number]: string;
+  [index: number]: {
+    status: string;
+    velocity: number;
+  }
 };
 
 const carModels = [
@@ -85,7 +88,11 @@ function App() {
       }),
     });
     const carData = await response.json();
-    setCarsStatus((prev) => ({ ...prev, [carData.id]: `${carData.id} status: engine off` }));
+    setCarsStatus((prev) => ({ ...prev,
+      [carData.id]: {
+        status: `${carData.id} status: engine off`,
+        velocity: 0,
+      } }));
   }
 
   function onSubmitCreateHandler(event: React.FormEvent<HTMLFormElement>) {
@@ -141,16 +148,28 @@ function App() {
   }
 
   async function switchToDrive(id: number) {
-    setCarsStatus((prev) => ({ ...prev, [id]: `${prev[id]} driving...` }));
+    setCarsStatus((prev) => ({ ...prev,
+      [id]: {
+        status: `${prev[id].status} driving...`,
+        velocity: 0,
+      } }));
     const response = await fetch(`${BASE_URL}/engine?id=${id}&status=drive`, {
       method: 'PATCH',
     });
     switch (response.status) {
       case 200:
-        setCarsStatus((prev) => ({ ...prev, [id]: `${prev[id]} finished!` }));
+        setCarsStatus((prev) => ({ ...prev,
+          [id]: {
+            status: `${prev[id].status} finished!`,
+            velocity: 0,
+          } }));
         break;
       case 500:
-        setCarsStatus((prev) => ({ ...prev, [id]: 'status: engine off!, car broken :(' }));
+        setCarsStatus((prev) => ({ ...prev,
+          [id]: {
+            status: 'status: engine off!, car broken :(',
+            velocity: 0,
+          } }));
         break;
       default:
         console.log(response.statusText);
@@ -163,8 +182,26 @@ function App() {
       method: 'PATCH',
     });
     const carData = await response.json();
-    setCarsStatus((prev) => ({ ...prev, [id]: `status: engine on, velocity: ${carData.velocity}` }));
+    setCarsStatus((prev) => ({ ...prev,
+      [id]: {
+        status: `status: engine on, velocity: ${carData.velocity}`,
+        velocity: carData.velocity,
+      } }));
     switchToDrive(id);
+  }
+
+  async function handleStopCar(id: number) {
+    const response = await fetch(`${BASE_URL}/engine?id=${id}&status=stopped`, {
+      method: 'PATCH',
+    });
+    const carData = await response.json();
+    console.log(carData);
+    setCarsStatus((prev) => ({ ...prev,
+      [id]: {
+        status: `${prev[id].status} stopped!`,
+        velocity: carData.velocity,
+      } }));
+    // switchToDrive(id);
   }
 
   async function handleStartAllCars() {
@@ -227,9 +264,9 @@ function App() {
             <button type="button" onClick={() => setEditCar(car)}>edit</button>
             <button type="button" onClick={() => handleDeleteCar(car.id)}>delete</button>
             <button type="button" onClick={() => handleStartCar(car.id)}>start</button>
-            <button type="button">stop</button>
+            <button type="button" onClick={() => handleStopCar(car.id)}>stop</button>
             <span id={`car_id_${car.id}_info`}>{
-              carsStatus[car.id] ? carsStatus[car.id] : 'status: engine off'
+              carsStatus[car.id] ? carsStatus[car.id].status : 'status: engine off '
             }
             </span>
           </div>
