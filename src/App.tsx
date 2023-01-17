@@ -13,6 +13,18 @@ type TCarsStatus = {
   [index: number]: string;
 };
 
+const carModels = [
+  ['Tesla', 'BMW', 'Mercedes', 'Opel', 'Skoda', 'Audi', 'Crysler', 'Dodge', 'Ford', 'Ferrari',
+    'Lamborghini', 'Peugeout', 'Fisker', 'Aston Martin', 'Lada'],
+  ['Model S', 'Model E', 'Model X', 'Model Y', '230i', '540d', 'Corsa', 'Octavia', 'Fabia', 'Rapid',
+    '300c', 'Viper', 'Mustang', 'Karma', 'Aventador']];
+
+function generateRandomInt(min: number, max: number) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function App() {
   const [garage, setGarage] = useState<TCar[]>([]);
   const [totalCars, setTotalCars] = useState('0');
@@ -115,7 +127,8 @@ function App() {
   async function handleGenerateCars(quantity: number) {
     console.log(`generate ${quantity} cars`);
     for (let i = 1; i <= quantity; i += 1) {
-      createNewCar(newCarName, `#${generateRandomColor()}`);
+      createNewCar(`${carModels[0][generateRandomInt(0, 14)]} ${carModels[1][generateRandomInt(0, 14)]}`,
+        `#${generateRandomColor()}`);
     }
     await getGarage();
   }
@@ -202,6 +215,11 @@ function App() {
 
         <div>Race track</div>
         <div>Total cars: {totalCars}</div>
+        <div>pagination
+          <button type="button" onClick={() => handlePagination(currentPage - 1)}> - </button>
+          <span>{currentPage}</span>
+          <button type="button" onClick={() => handlePagination(currentPage + 1)}> + </button>
+        </div>
         {garage.map((car) => (
           <div id={`car_id_${car.id}`}>
             <div>{car.id} {car.name} {car.color}</div>
@@ -216,13 +234,7 @@ function App() {
             </span>
           </div>
         ))}
-        <div>pagination
-          <button type="button" onClick={() => handlePagination(currentPage - 1)}> - </button>
-          <span>{currentPage}</span>
-          <button type="button" onClick={() => handlePagination(currentPage + 1)}> + </button>
-        </div>
       </div>
-
       <div>Score tab</div>
     </div>
   );
