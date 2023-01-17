@@ -198,7 +198,7 @@ function App() {
     console.log(carData);
     setCarsStatus((prev) => ({ ...prev,
       [id]: {
-        status: `${prev[id].status} stopped!`,
+        status: prev[id] ? `${prev[id].status}, velocity: ${carData.velocity}, stopped!` : 'reseted',
         velocity: carData.velocity,
       } }));
     // switchToDrive(id);
@@ -207,6 +207,12 @@ function App() {
   async function handleStartAllCars() {
     for (let id = 1; id <= Number(totalCars); id += 1) {
       handleStartCar(id);
+    }
+  }
+
+  async function handleStopAllCars() {
+    for (let id = 1; id <= Number(totalCars); id += 1) {
+      handleStopCar(id);
     }
   }
 
@@ -246,7 +252,7 @@ function App() {
           <button type="submit">update</button>
         </form>
         <button type="button" onClick={() => handleStartAllCars()}>race</button>
-        <button type="button">reset</button>
+        <button type="button" onClick={() => handleStopAllCars()}>reset</button>
         <button type="button" onClick={() => handleGenerateCars(20)}>generate cars 20</button>
         <button type="button" onClick={() => handleGenerateCars(100)}>generate cars 100</button>
 
