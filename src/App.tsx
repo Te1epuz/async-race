@@ -60,6 +60,8 @@ function App() {
   }
 
   async function createNewCar(carName: string, carColor: string) {
+    setNewCarName('');
+    setNewCarColor(`#${generateRandomColor()}`);
     const response = await fetch(`${BASE_URL}/garage`, {
       method: 'POST',
       headers: {
@@ -71,8 +73,6 @@ function App() {
       }),
     });
     const carData = await response.json();
-    setNewCarName('');
-    setNewCarColor(`#${generateRandomColor()}`);
     setCarsStatus((prev) => ({ ...prev, [carData.id]: `${carData.id} status: engine off` }));
   }
 
@@ -111,6 +111,14 @@ function App() {
       setEditCarColor(editCar.color);
     }
   }, [editCar]);
+
+  async function handleGenerateCars(quantity: number) {
+    console.log(`generate ${quantity} cars`);
+    for (let i = 1; i <= quantity; i += 1) {
+      createNewCar(newCarName, `#${generateRandomColor()}`);
+    }
+    await getGarage();
+  }
 
   async function handleDeleteCar(id: number) {
     await fetch(`${BASE_URL}/garage/${id}`, {
@@ -189,7 +197,8 @@ function App() {
         </form>
         <button type="button" onClick={() => handleStartAllCars()}>race</button>
         <button type="button">reset</button>
-        <button type="button">generate cars</button>
+        <button type="button" onClick={() => handleGenerateCars(20)}>generate cars 20</button>
+        <button type="button" onClick={() => handleGenerateCars(100)}>generate cars 100</button>
 
         <div>Race track</div>
         <div>Total cars: {totalCars}</div>
