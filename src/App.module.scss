@@ -6,3 +6,23 @@
   -webkit-mask-image: url(./car.svg);
   mask-image: url(./car.svg);
 }
+
+@keyframes animateCar {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(90vw);
+  }
+}
+
+.car__img_drive {
+  animation: animateCar linear;
+  animation-fill-mode: forwards;
+}
+
+.car__img_broken {
+  animation: animateCar linear;
+  animation-play-state: paused;
+}
