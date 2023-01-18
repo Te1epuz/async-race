@@ -211,9 +211,9 @@ function App() {
   }
 
   async function handleStopAllCars() {
-    for (let id = 1; id <= Number(totalCars); id += 1) {
-      handleStopCar(id);
-    }
+    garage.forEach((car) => {
+      handleStopCar(car.id);
+    });
   }
 
   return (
