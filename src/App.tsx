@@ -151,7 +151,7 @@ function App() {
     setCarsStatus((prev) => ({ ...prev,
       [id]: {
         status: `${prev[id].status} driving...`,
-        velocity: 0,
+        velocity: prev[id].velocity,
       } }));
     const response = await fetch(`${BASE_URL}/engine?id=${id}&status=drive`, {
       method: 'PATCH',
@@ -161,14 +161,14 @@ function App() {
         setCarsStatus((prev) => ({ ...prev,
           [id]: {
             status: `${prev[id].status} finished!`,
-            velocity: 0,
+            velocity: prev[id].velocity,
           } }));
         break;
       case 500:
         setCarsStatus((prev) => ({ ...prev,
           [id]: {
             status: 'status: engine off!, car broken :(',
-            velocity: 0,
+            velocity: prev[id].velocity,
           } }));
         break;
       default:
@@ -195,11 +195,11 @@ function App() {
       method: 'PATCH',
     });
     const carData = await response.json();
-    console.log(carData);
+    // console.log(carData);
     setCarsStatus((prev) => ({ ...prev,
       [id]: {
         status: prev[id] ? `${prev[id].status}, velocity: ${carData.velocity}, stopped!` : 'reseted',
-        velocity: carData.velocity,
+        velocity: 0,
       } }));
     // switchToDrive(id);
   }
@@ -264,9 +264,21 @@ function App() {
           <button type="button" onClick={() => handlePagination(currentPage + 1)}> + </button>
         </div>
         {garage.map((car) => (
-          <div id={`car_id_${car.id}`}>
+          <div id={`car_id_${car.id}`} key={car.id}>
             <div>{car.id} {car.name} {car.color}</div>
-            <div className={styles.car__img} style={{ backgroundColor: car.color }} />
+            <div
+              className={styles.car__img}
+              style={carsStatus[car.id] ?
+                {
+                  backgroundColor: car.color,
+                  transition: `transform ${(carsStatus[car.id].velocity > 0 ?
+                    (500 / carsStatus[car.id].velocity) : 0)}s linear`,
+                  transform: `${carsStatus[car.id].velocity > 0 ? 'translateX(90vw)' : ''}`,
+                }
+                : {
+                  backgroundColor: car.color,
+                }}
+            />
             <button type="button" onClick={() => setEditCar(car)}>edit</button>
             <button type="button" onClick={() => handleDeleteCar(car.id)}>delete</button>
             <button type="button" onClick={() => handleStartCar(car.id)}>start</button>
