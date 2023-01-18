@@ -38,6 +38,8 @@ function App() {
   const [editCarColor, setEditCarColor] = useState('#000000');
   const [currentPage, setCurrentPage] = useState(1);
   const [carsStatus, setCarsStatus] = useState<TCarsStatus>({});
+  const [isRaceAvailable, setIsRaceAvailable] = useState(true);
+  const [isResetAvailable, setIsResetAvailable] = useState(false);
 
   async function getGarage() {
     const response = await fetch(`${BASE_URL}/garage?_page=${currentPage}&_limit=7`);
@@ -90,7 +92,7 @@ function App() {
     const carData = await response.json();
     setCarsStatus((prev) => ({ ...prev,
       [carData.id]: {
-        status: `${carData.id} status: engine off`,
+        status: `${carData.id} status: stopped!?`,
         velocity: 0,
       } }));
   }
@@ -163,11 +165,12 @@ function App() {
             status: `${prev[id].status} finished!`,
             velocity: prev[id].velocity,
           } }));
+        setIsResetAvailable(true);
         break;
       case 500:
         setCarsStatus((prev) => ({ ...prev,
           [id]: {
-            status: 'status: engine off!, car broken :(',
+            status: `${prev[id].status}, car broken :(`,
             velocity: prev[id].velocity,
           } }));
         break;
@@ -198,22 +201,25 @@ function App() {
     // console.log(carData);
     setCarsStatus((prev) => ({ ...prev,
       [id]: {
-        status: prev[id] ? `status: engine off, velocity: ${carData.velocity}, stopped!` : 'reseted',
+        status: prev[id] ? `status: engine off, velocity: ${carData.velocity}, stopped!` : 'stopped!!',
         velocity: 0,
       } }));
     // switchToDrive(id);
   }
 
   async function handleStartAllCars() {
+    setIsRaceAvailable(false);
     garage.forEach((car) => {
       handleStartCar(car.id);
     });
   }
 
   async function handleStopAllCars() {
+    setIsResetAvailable(false);
     garage.forEach((car) => {
       handleStopCar(car.id);
     });
+    setIsRaceAvailable(true);
   }
 
   return (
@@ -251,17 +257,27 @@ function App() {
           />
           <button type="submit">update</button>
         </form>
-        <button type="button" onClick={() => handleStartAllCars()}>race</button>
-        <button type="button" onClick={() => handleStopAllCars()}>reset</button>
+        <button type="button" onClick={() => handleStartAllCars()} disabled={!isRaceAvailable}>race</button>
+        <button type="button" onClick={() => handleStopAllCars()} disabled={!isResetAvailable}>reset</button>
         <button type="button" onClick={() => handleGenerateCars(20)}>generate cars 20</button>
         <button type="button" onClick={() => handleGenerateCars(100)}>generate cars 100</button>
 
         <div>Race track</div>
         <div>Total cars: {totalCars}</div>
         <div>pagination
-          <button type="button" onClick={() => handlePagination(currentPage - 1)}> - </button>
+          <button
+            type="button"
+            onClick={() => handlePagination(currentPage - 1)}
+            disabled={!isRaceAvailable}
+          >-
+          </button>
           <span>{currentPage}</span>
-          <button type="button" onClick={() => handlePagination(currentPage + 1)}> + </button>
+          <button
+            type="button"
+            onClick={() => handlePagination(currentPage + 1)}
+            disabled={!isRaceAvailable}
+          >+
+          </button>
         </div>
         {garage.map((car) => (
           <div id={`car_id_${car.id}`} key={car.id}>
@@ -283,10 +299,20 @@ function App() {
             />
             <button type="button" onClick={() => setEditCar(car)}>edit</button>
             <button type="button" onClick={() => handleDeleteCar(car.id)}>delete</button>
-            <button type="button" onClick={() => handleStartCar(car.id)}>start</button>
-            <button type="button" onClick={() => handleStopCar(car.id)}>stop</button>
+            <button
+              type="button"
+              onClick={() => handleStartCar(car.id)}
+              disabled={(!!carsStatus[car.id] && carsStatus[car.id].status.includes('driving'))}
+            >start
+            </button>
+            <button
+              type="button"
+              onClick={() => handleStopCar(car.id)}
+              disabled={(!carsStatus[car.id] || carsStatus[car.id].status.includes('stopped'))}
+            >stop
+            </button>
             <span id={`car_id_${car.id}_info`}>{
-              carsStatus[car.id] ? carsStatus[car.id].status : 'status: engine off '
+              carsStatus[car.id] ? carsStatus[car.id].status : 'status: parked '
             }
             </span>
           </div>
