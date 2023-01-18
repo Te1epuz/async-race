@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styles from './App.module.scss';
-
-const BASE_URL = 'http://127.0.0.1:3000';
+import { BASE_URL } from './constances';
+import { TWinner } from './types';
+import { createWinner } from './winners/services';
+import { Winners } from './winners/Winners';
 
 type TCar = {
   name: string;
@@ -40,6 +42,9 @@ function App() {
   const [carsStatus, setCarsStatus] = useState<TCarsStatus>({});
   const [isRaceAvailable, setIsRaceAvailable] = useState(true);
   const [isResetAvailable, setIsResetAvailable] = useState(false);
+  const [winnersList, setWinnersList] = useState<TWinner[]>([]);
+  const [totalWinners, setTotalWinners] = useState('0');
+  let winnerCar = 0;
 
   async function getGarage() {
     const response = await fetch(`${BASE_URL}/garage?_page=${currentPage}&_limit=7`);
@@ -47,6 +52,20 @@ function App() {
     if (totalCarsInHeader) setTotalCars(totalCarsInHeader);
     const data = await response.json();
     setGarage(data);
+  }
+
+  async function getWinnersList() {
+    const response = await fetch(`${BASE_URL}/winners?_page=1&_limit=10&_sort=time&_order='ASC`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const totalWinnersInHeader = response.headers.get('X-Total-Count');
+    if (totalWinnersInHeader) setTotalWinners(totalWinnersInHeader);
+    console.log(totalWinners);
+    const winnersData = await response.json();
+    setWinnersList(winnersData);
   }
 
   function handlePagination(page: number) {
@@ -65,6 +84,7 @@ function App() {
     // window.addEventListener('click', handleClick);
     handlePagination(currentPage);
     getGarage();
+    getWinnersList();
     setEditCarName('');
     setEditCar(undefined);
     // return () => {
@@ -166,6 +186,10 @@ function App() {
             velocity: prev[id].velocity,
           } }));
         setIsResetAvailable(true);
+        if (winnerCar === 0) {
+          winnerCar = id;
+          createWinner(winnerCar);
+        }
         break;
       case 500:
         setCarsStatus((prev) => ({ ...prev,
@@ -268,14 +292,14 @@ function App() {
           <button
             type="button"
             onClick={() => handlePagination(currentPage - 1)}
-            disabled={!isRaceAvailable}
+            disabled={!isRaceAvailable && !isResetAvailable}
           >-
           </button>
           <span>{currentPage}</span>
           <button
             type="button"
             onClick={() => handlePagination(currentPage + 1)}
-            disabled={!isRaceAvailable}
+            disabled={!isRaceAvailable && !isResetAvailable}
           >+
           </button>
         </div>
@@ -319,6 +343,7 @@ function App() {
         ))}
       </div>
       <div>Score tab</div>
+      <Winners winnersList={winnersList} />
     </div>
   );
 }
