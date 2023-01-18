@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './App.module.scss';
 import { BASE_URL } from './constances';
 import { TWinner } from './types';
-import { createWinner } from './winners/services';
+import { createWinner } from './services';
 import { Winners } from './winners/Winners';
 
 type TCar = {
@@ -188,7 +188,8 @@ function App() {
         setIsResetAvailable(true);
         if (winnerCar === 0) {
           winnerCar = id;
-          createWinner(winnerCar);
+          createWinner(winnerCar, winnersList);
+          getWinnersList();
         }
         break;
       case 500:
