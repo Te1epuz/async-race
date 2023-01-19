@@ -208,7 +208,6 @@ function App() {
             status: `${prev[id].status} finished!`,
             velocity: prev[id].velocity,
           } }));
-        setIsResetAvailable(true);
         if (winnerCarData.id === 0) {
           winnerCarData.id = id;
           winnerCarData.name = carName;
@@ -218,6 +217,7 @@ function App() {
           await createWinner(id, winnerCarData.time);
           getWinnersList();
         }
+        setIsResetAvailable(true);
         break;
       case 500:
         setCarsStatus((prev) => ({ ...prev,
@@ -262,7 +262,7 @@ function App() {
   async function handleStartAllCars() {
     setIsRaceAvailable(false);
     garage.forEach((car) => {
-      if (!carsStatus[car.id].status.includes('driving')) handleStartCar(car.id, car.name, car.color);
+      if (!carsStatus[car.id]?.status.includes('driving')) handleStartCar(car.id, car.name, car.color);
     });
   }
 
@@ -375,6 +375,7 @@ function App() {
         ))}
         <div hidden={!isWinnerPopUpActive}>Winner Pop Up
           <div>{winnerCarData.id} {winnerCarData.name} {winnerCarData.color}</div>
+          <button type="button" onClick={() => handleStopAllCars()} disabled={!isResetAvailable}>reset</button>
         </div>
       </div>
       <div hidden={isGarageShown}>Score tab
