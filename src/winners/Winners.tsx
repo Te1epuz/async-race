@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getCar } from '../services';
 import { TCar, TWinner } from '../types';
 import styles from './Winners.module.scss';
@@ -6,6 +6,10 @@ import styles from './Winners.module.scss';
 type Tprops = {
   winnersList: TWinner[];
   totalWinners: string;
+  sortWinnersBy: 'time' | 'wins' | 'id';
+  setSortWinnersBy: React.Dispatch<React.SetStateAction<'time' | 'wins' | 'id'>>;
+  sortWinnersDirection: 'ASC' | 'DESC';
+  setSortWinnersDirection: React.Dispatch<React.SetStateAction<'ASC' | 'DESC'>>;
 }
 
 type TWinnersData = {
@@ -15,7 +19,8 @@ type TWinnersData = {
   }
 };
 
-export function Winners({ winnersList, totalWinners }: Tprops) {
+export function Winners({ winnersList, totalWinners, sortWinnersBy, setSortWinnersBy,
+  sortWinnersDirection, setSortWinnersDirection }: Tprops) {
   const [carsData, setCarsData] = useState<TWinnersData>({});
 
   async function fetchCarData(id: number) {
@@ -25,6 +30,16 @@ export function Winners({ winnersList, totalWinners }: Tprops) {
         name: data.name,
         color: data.color,
       } }));
+  }
+
+  function handleChangeSortBy(sortBy: 'time' | 'wins' | 'id') {
+    if (sortWinnersBy !== sortBy) {
+      setSortWinnersBy(sortBy);
+      setSortWinnersDirection('ASC');
+    } else if (sortBy === sortWinnersBy) {
+      if (sortWinnersDirection === 'ASC') setSortWinnersDirection('DESC');
+      else setSortWinnersDirection('ASC');
+    }
   }
 
   useEffect(() => {
@@ -39,11 +54,20 @@ export function Winners({ winnersList, totalWinners }: Tprops) {
       <table>
         <thead>
           <tr>
-            <th>#</th>
+            <th
+              onClick={() => handleChangeSortBy('id')}
+            >#{sortWinnersBy === 'id' ? sortWinnersDirection === 'ASC' ? '▾' : '▴' : ''}
+            </th>
             <th>Car</th>
             <th>Name</th>
-            <th>Wins</th>
-            <th>Best time</th>
+            <th
+              onClick={() => handleChangeSortBy('wins')}
+            >Wins{sortWinnersBy === 'wins' ? sortWinnersDirection === 'ASC' ? '▾' : '▴' : ''}
+            </th>
+            <th
+              onClick={() => handleChangeSortBy('time')}
+            >Best time{sortWinnersBy === 'time' ? sortWinnersDirection === 'ASC' ? '▾' : '▴' : ''}
+            </th>
           </tr>
         </thead>
         <tbody>

@@ -46,6 +46,8 @@ function App() {
   const [isResetAvailable, setIsResetAvailable] = useState(false);
   const [winnersList, setWinnersList] = useState<TWinner[]>([]);
   const [totalWinners, setTotalWinners] = useState('0');
+  const [sortWinnersBy, setSortWinnersBy] = useState<'time' | 'wins' | 'id'>('time');
+  const [sortWinnersDirection, setSortWinnersDirection] = useState<'ASC' | 'DESC'>('ASC');
 
   async function getGarage() {
     const response = await fetch(`${BASE_URL}/garage?_page=${currentPage}&_limit=7`);
@@ -56,15 +58,15 @@ function App() {
   }
 
   async function getWinnersList() {
-    const response = await fetch(`${BASE_URL}/winners?_page=1&_limit=10&_sort=time&_order='ASC`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(
+      `${BASE_URL}/winners?_page=1&_limit=10&_sort=${sortWinnersBy}&_order=${sortWinnersDirection}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
     const totalWinnersInHeader = response.headers.get('X-Total-Count');
     if (totalWinnersInHeader) setTotalWinners(totalWinnersInHeader);
-    console.log(totalWinners);
     const winnersData = await response.json();
     setWinnersList(winnersData);
   }
@@ -91,7 +93,7 @@ function App() {
     // return () => {
     //   window.removeEventListener('click', handleClick);
     // };
-  }, [currentPage, totalCars]);
+  }, [currentPage, totalCars, sortWinnersBy, sortWinnersDirection]);
 
   function generateRandomColor() {
     return Math.random().toString(16).slice(2, 8).toUpperCase();
@@ -346,7 +348,14 @@ function App() {
         ))}
       </div>
       <div>Score tab</div>
-      <Winners winnersList={winnersList} totalWinners={totalWinners} />
+      <Winners
+        winnersList={winnersList}
+        totalWinners={totalWinners}
+        sortWinnersBy={sortWinnersBy}
+        setSortWinnersBy={setSortWinnersBy}
+        sortWinnersDirection={sortWinnersDirection}
+        setSortWinnersDirection={setSortWinnersDirection}
+      />
     </div>
   );
 }
