@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './App.module.scss';
-import { BASE_URL } from './constances';
+import { BASE_URL, CARS_PER_PAGE, WINNERS_PER_PAGE } from './constances';
 import { TWinner } from './types';
 import { createWinner, deleteWinner } from './services';
 import { Winners } from './winners/Winners';
@@ -48,9 +48,10 @@ function App() {
   const [totalWinners, setTotalWinners] = useState('0');
   const [sortWinnersBy, setSortWinnersBy] = useState<'time' | 'wins' | 'id'>('time');
   const [sortWinnersDirection, setSortWinnersDirection] = useState<'ASC' | 'DESC'>('ASC');
+  const [currentWinnersPage, setCurrentWinnersPage] = useState(1);
 
   async function getGarage() {
-    const response = await fetch(`${BASE_URL}/garage?_page=${currentPage}&_limit=7`);
+    const response = await fetch(`${BASE_URL}/garage?_page=${currentPage}&_limit=${CARS_PER_PAGE}`);
     const totalCarsInHeader = response.headers.get('X-Total-Count');
     if (totalCarsInHeader) setTotalCars(totalCarsInHeader);
     const data = await response.json();
@@ -59,7 +60,8 @@ function App() {
 
   async function getWinnersList() {
     const response = await fetch(
-      `${BASE_URL}/winners?_page=1&_limit=10&_sort=${sortWinnersBy}&_order=${sortWinnersDirection}`, {
+      `${BASE_URL}/winners?_page=${currentWinnersPage}
+        &_limit=${WINNERS_PER_PAGE} &_sort=${sortWinnersBy}&_order=${sortWinnersDirection}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -73,9 +75,18 @@ function App() {
 
   function handlePagination(page: number) {
     let newPage = page;
-    if (newPage > Math.ceil(Number(totalCars)) / 7) newPage = Math.ceil(Number(totalCars) / 7);
+    if (newPage > Math.ceil(Number(totalCars)) / CARS_PER_PAGE) newPage = Math.ceil(Number(totalCars) / CARS_PER_PAGE);
     if (newPage < 1) newPage = 1;
     setCurrentPage(newPage);
+  }
+
+  function handleWinnersPagination(page: number) {
+    let newPage = page;
+    if (newPage > Math.ceil(Number(totalWinners)) / WINNERS_PER_PAGE) {
+      newPage = Math.ceil(Number(totalWinners) / WINNERS_PER_PAGE);
+    }
+    if (newPage < 1) newPage = 1;
+    setCurrentWinnersPage(newPage);
   }
 
   // function handleClick(event: MouseEvent) {
@@ -93,7 +104,7 @@ function App() {
     // return () => {
     //   window.removeEventListener('click', handleClick);
     // };
-  }, [currentPage, totalCars, sortWinnersBy, sortWinnersDirection]);
+  }, [currentPage, totalCars, currentWinnersPage, sortWinnersBy, sortWinnersDirection]);
 
   function generateRandomColor() {
     return Math.random().toString(16).slice(2, 8).toUpperCase();
@@ -171,6 +182,7 @@ function App() {
     });
     await deleteWinner(id);
     await getGarage();
+    await getWinnersList();
   }
 
   async function switchToDrive(id: number, velocity: number) {
@@ -348,15 +360,31 @@ function App() {
           </div>
         ))}
       </div>
-      <div>Score tab</div>
-      <Winners
-        winnersList={winnersList}
-        totalWinners={totalWinners}
-        sortWinnersBy={sortWinnersBy}
-        setSortWinnersBy={setSortWinnersBy}
-        sortWinnersDirection={sortWinnersDirection}
-        setSortWinnersDirection={setSortWinnersDirection}
-      />
+      <div>Score tab
+        <div>Winners pagination
+          <button
+            type="button"
+            onClick={() => handleWinnersPagination(currentWinnersPage - 1)}
+            disabled={!isRaceAvailable && !isResetAvailable}
+          >-
+          </button>
+          <span>{currentWinnersPage}</span>
+          <button
+            type="button"
+            onClick={() => handleWinnersPagination(currentWinnersPage + 1)}
+            disabled={!isRaceAvailable && !isResetAvailable}
+          >+
+          </button>
+        </div>
+        <Winners
+          winnersList={winnersList}
+          totalWinners={totalWinners}
+          sortWinnersBy={sortWinnersBy}
+          setSortWinnersBy={setSortWinnersBy}
+          sortWinnersDirection={sortWinnersDirection}
+          setSortWinnersDirection={setSortWinnersDirection}
+        />
+      </div>
     </div>
   );
 }
