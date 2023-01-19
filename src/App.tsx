@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './App.module.scss';
 import { BASE_URL } from './constances';
 import { TWinner } from './types';
-import { createWinner } from './services';
+import { createWinner, deleteWinner } from './services';
 import { Winners } from './winners/Winners';
 
 type TCar = {
@@ -169,6 +169,7 @@ function App() {
     await fetch(`${BASE_URL}/garage/${id}`, {
       method: 'DELETE',
     });
+    await deleteWinner(id);
     await getGarage();
   }
 

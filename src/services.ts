@@ -31,6 +31,12 @@ export async function createWinner(id: number, velocity: number, winnersList: TW
   }
 }
 
+export async function deleteWinner(id: number) {
+  await fetch(`${BASE_URL}/winners/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 export async function getCar(id: number) {
   const response = await fetch(`${BASE_URL}/garage/${id}`);
   const data: TCar = await response.json();

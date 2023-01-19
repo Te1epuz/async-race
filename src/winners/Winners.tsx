@@ -71,6 +71,7 @@ export function Winners({ winnersList, totalWinners, sortWinnersBy, setSortWinne
           </tr>
         </thead>
         <tbody>
+          {winnersList.length === 0 ? <tr><td colSpan={5}>No winners to display :(</td></tr> : ''}
           {winnersList.map((winner: TWinner) => (
             <tr key={winner.id}>
               <td>{winner.id} </td>
