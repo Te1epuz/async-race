@@ -4,7 +4,8 @@ import { TCar, TWinner } from '../types';
 import styles from './Winners.module.scss';
 
 type Tprops = {
-  winnersList: TWinner[]
+  winnersList: TWinner[];
+  totalWinners: string;
 }
 
 type TWinnersData = {
@@ -14,7 +15,7 @@ type TWinnersData = {
   }
 };
 
-export function Winners({ winnersList }: Tprops) {
+export function Winners({ winnersList, totalWinners }: Tprops) {
   const [carsData, setCarsData] = useState<TWinnersData>({});
 
   async function fetchCarData(id: number) {
@@ -34,13 +35,13 @@ export function Winners({ winnersList }: Tprops) {
 
   return (
     <div>
-      <div>winners table</div>
+      <div>Total winners: {totalWinners}</div>
       {winnersList.map((winner: TWinner) => (
         <div key={winner.id}>
           <span>{winner.id} </span>
           <div className={styles.car__img} style={{ backgroundColor: carsData[winner.id]?.color }} />
           <span>{carsData[winner.id]?.name} </span>
-          <span>{winner.wins}</span>
+          <span>{winner.wins} </span>
           <span>{winner.time} </span>
         </div>
       ))}

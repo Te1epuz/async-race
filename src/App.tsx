@@ -346,7 +346,7 @@ function App() {
         ))}
       </div>
       <div>Score tab</div>
-      <Winners winnersList={winnersList} />
+      <Winners winnersList={winnersList} totalWinners={totalWinners} />
     </div>
   );
 }
