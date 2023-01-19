@@ -30,6 +30,8 @@ function generateRandomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+let winnerCar = 0;
+
 function App() {
   const [garage, setGarage] = useState<TCar[]>([]);
   const [totalCars, setTotalCars] = useState('0');
@@ -44,7 +46,6 @@ function App() {
   const [isResetAvailable, setIsResetAvailable] = useState(false);
   const [winnersList, setWinnersList] = useState<TWinner[]>([]);
   const [totalWinners, setTotalWinners] = useState('0');
-  let winnerCar = 0;
 
   async function getGarage() {
     const response = await fetch(`${BASE_URL}/garage?_page=${currentPage}&_limit=7`);
@@ -169,7 +170,7 @@ function App() {
     await getGarage();
   }
 
-  async function switchToDrive(id: number) {
+  async function switchToDrive(id: number, velocity: number) {
     setCarsStatus((prev) => ({ ...prev,
       [id]: {
         status: `${prev[id].status} driving...`,
@@ -188,7 +189,7 @@ function App() {
         setIsResetAvailable(true);
         if (winnerCar === 0) {
           winnerCar = id;
-          createWinner(winnerCar, winnersList);
+          createWinner(winnerCar, velocity, winnersList);
           getWinnersList();
         }
         break;
@@ -215,7 +216,7 @@ function App() {
         status: `status: engine on, velocity: ${carData.velocity}`,
         velocity: carData.velocity,
       } }));
-    switchToDrive(id);
+    switchToDrive(id, carData.velocity);
   }
 
   async function handleStopCar(id: number) {
@@ -245,6 +246,7 @@ function App() {
       handleStopCar(car.id);
     });
     setIsRaceAvailable(true);
+    winnerCar = 0;
   }
 
   return (

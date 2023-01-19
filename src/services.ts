@@ -1,9 +1,10 @@
 import { BASE_URL } from './constances';
 import { TWinner, TCar } from './types';
 
-export async function createWinner(id: number, winnersList: TWinner[]) {
-  console.log('winner with id ', id, ' should be added');
+export async function createWinner(id: number, velocity: number, winnersList: TWinner[]) {
   const winnerInList = winnersList.find((winner) => winner.id === id);
+  const newTime = Math.round((500 / velocity) * 100) / 100;
+  console.log('winner with id ', id, ' and time ', newTime, ' should be added');
   if (!winnerInList) {
     await fetch(`${BASE_URL}/winners`, {
       method: 'POST',
@@ -13,7 +14,7 @@ export async function createWinner(id: number, winnersList: TWinner[]) {
       body: JSON.stringify({
         id,
         wins: 1,
-        time: 10,
+        time: newTime,
       }),
     });
   } else {
@@ -24,7 +25,7 @@ export async function createWinner(id: number, winnersList: TWinner[]) {
       },
       body: JSON.stringify({
         wins: winnerInList.wins + 1,
-        time: 10,
+        time: newTime < winnerInList.time ? newTime : winnerInList.time,
       }),
     });
   }

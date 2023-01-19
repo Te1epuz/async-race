@@ -40,8 +40,8 @@ export function Winners({ winnersList }: Tprops) {
           <span>{winner.id} </span>
           <div className={styles.car__img} style={{ backgroundColor: carsData[winner.id]?.color }} />
           <span>{carsData[winner.id]?.name} </span>
-          <span>{winner.time} </span>
           <span>{winner.wins}</span>
+          <span>{winner.time} </span>
         </div>
       ))}
     </div>
