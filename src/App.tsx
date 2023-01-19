@@ -37,6 +37,8 @@ const winnerCarData = {
   time: 0,
 };
 
+let isRaceActive = false;
+
 function App() {
   const [garage, setGarage] = useState<TCar[]>([]);
   const [totalCars, setTotalCars] = useState('0');
@@ -208,7 +210,8 @@ function App() {
             status: `${prev[id].status} finished!`,
             velocity: prev[id].velocity,
           } }));
-        if (winnerCarData.id === 0) {
+        if (winnerCarData.id === 0 && isRaceActive === true) {
+          isRaceActive = false;
           winnerCarData.id = id;
           winnerCarData.name = carName;
           winnerCarData.color = carColor;
@@ -250,17 +253,16 @@ function App() {
       method: 'PATCH',
     });
     const carData = await response.json();
-    // console.log(carData);
     setCarsStatus((prev) => ({ ...prev,
       [id]: {
         status: prev[id] ? `status: engine off, velocity: ${carData.velocity}, stopped!` : 'stopped!!',
         velocity: 0,
       } }));
-    // switchToDrive(id);
   }
 
   async function handleStartAllCars() {
     setIsRaceAvailable(false);
+    isRaceActive = true;
     garage.forEach((car) => {
       if (!carsStatus[car.id]?.status.includes('driving')) handleStartCar(car.id, car.name, car.color);
     });
@@ -276,6 +278,7 @@ function App() {
     winnerCarData.id = 0;
     winnerCarData.name = '';
     winnerCarData.color = '';
+    isRaceActive = false;
   }
 
   return (
