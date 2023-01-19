@@ -1,11 +1,20 @@
 import { BASE_URL } from './constances';
 import { TWinner, TCar } from './types';
 
-export async function createWinner(id: number, velocity: number, winnersList: TWinner[]) {
-  const winnerInList = winnersList.find((winner) => winner.id === id);
+export async function getWinner(id: number) {
+  const response = await fetch(`${BASE_URL}/winners/${id}`);
+  if (response.status === 200) {
+    const data: TWinner = await response.json();
+    return data;
+  }
+  return undefined;
+}
+
+export async function createWinner(id: number, velocity: number) {
+  const winnerData = await getWinner(id);
   const newTime = Math.round((500 / velocity) * 100) / 100;
   console.log('winner with id ', id, ' and time ', newTime, ' should be added');
-  if (!winnerInList) {
+  if (!winnerData) {
     await fetch(`${BASE_URL}/winners`, {
       method: 'POST',
       headers: {
@@ -24,8 +33,8 @@ export async function createWinner(id: number, velocity: number, winnersList: TW
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        wins: winnerInList.wins + 1,
-        time: newTime < winnerInList.time ? newTime : winnerInList.time,
+        wins: winnerData.wins + 1,
+        time: newTime < winnerData.time ? newTime : winnerData.time,
       }),
     });
   }

@@ -23,7 +23,7 @@ export function Winners({ winnersList, totalWinners, sortWinnersBy, setSortWinne
   sortWinnersDirection, setSortWinnersDirection }: Tprops) {
   const [carsData, setCarsData] = useState<TWinnersData>({});
 
-  async function fetchCarData(id: number) {
+  async function getCarData(id: number) {
     const data: TCar = await getCar(id);
     setCarsData((prev) => ({ ...prev,
       [id]: {
@@ -44,7 +44,7 @@ export function Winners({ winnersList, totalWinners, sortWinnersBy, setSortWinne
 
   useEffect(() => {
     winnersList.forEach((winner) => {
-      fetchCarData(winner.id);
+      getCarData(winner.id);
     });
   }, [winnersList]);
 

@@ -30,7 +30,7 @@ function generateRandomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-let winnerCar = 0;
+let winnerCarId = 0;
 
 function App() {
   const [garage, setGarage] = useState<TCar[]>([]);
@@ -202,9 +202,9 @@ function App() {
             velocity: prev[id].velocity,
           } }));
         setIsResetAvailable(true);
-        if (winnerCar === 0) {
-          winnerCar = id;
-          createWinner(winnerCar, velocity, winnersList);
+        if (winnerCarId === 0) {
+          winnerCarId = id;
+          await createWinner(winnerCarId, velocity);
           getWinnersList();
         }
         break;
@@ -261,7 +261,7 @@ function App() {
       handleStopCar(car.id);
     });
     setIsRaceAvailable(true);
-    winnerCar = 0;
+    winnerCarId = 0;
   }
 
   return (
@@ -359,6 +359,8 @@ function App() {
             </span>
           </div>
         ))}
+      </div>
+      <div>Winner Pop Up
       </div>
       <div>Score tab
         <div>Winners pagination
