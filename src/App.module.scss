@@ -26,3 +26,8 @@
   animation: animateCar linear;
   animation-play-state: paused;
 }
+
+.hidden {
+  height: 0;
+  overflow: hidden;
+}

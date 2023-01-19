@@ -55,6 +55,7 @@ function App() {
   const [sortWinnersDirection, setSortWinnersDirection] = useState<'ASC' | 'DESC'>('ASC');
   const [currentWinnersPage, setCurrentWinnersPage] = useState(1);
   const [isWinnerPopUpActive, setIsWinnerPopUpActive] = useState(false);
+  const [isGarageShown, setIsGarageShown] = useState(true);
 
   async function getGarage() {
     const response = await fetch(`${BASE_URL}/garage?_page=${currentPage}&_limit=${CARS_PER_PAGE}`);
@@ -281,10 +282,10 @@ function App() {
     <div className={styles.wrapper}>
       <header className={styles.header}>
         Header
-        <button type="button">to garage</button>
-        <button type="button">to winners</button>
+        <button type="button" onClick={() => setIsGarageShown(true)}>to garage</button>
+        <button type="button" onClick={() => setIsGarageShown(false)}>to winners</button>
       </header>
-      <div>
+      <div className={!isGarageShown ? styles.hidden : ''}>
         Garage
         <form onSubmit={onSubmitCreateHandler}>
           <input
@@ -372,11 +373,11 @@ function App() {
             </span>
           </div>
         ))}
+        <div hidden={!isWinnerPopUpActive}>Winner Pop Up
+          <div>{winnerCarData.id} {winnerCarData.name} {winnerCarData.color}</div>
+        </div>
       </div>
-      <div hidden={!isWinnerPopUpActive}>Winner Pop Up
-        <div>{winnerCarData.id} {winnerCarData.name} {winnerCarData.color}</div>
-      </div>
-      <div>Score tab
+      <div hidden={isGarageShown}>Score tab
         <div>Winners pagination
           <button
             type="button"
