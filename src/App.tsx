@@ -30,7 +30,12 @@ function generateRandomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-let winnerCarId = 0;
+const winnerCarData = {
+  id: 0,
+  name: '',
+  color: '',
+  time: 0,
+};
 
 function App() {
   const [garage, setGarage] = useState<TCar[]>([]);
@@ -49,6 +54,7 @@ function App() {
   const [sortWinnersBy, setSortWinnersBy] = useState<'time' | 'wins' | 'id'>('time');
   const [sortWinnersDirection, setSortWinnersDirection] = useState<'ASC' | 'DESC'>('ASC');
   const [currentWinnersPage, setCurrentWinnersPage] = useState(1);
+  const [isWinnerPopUpActive, setIsWinnerPopUpActive] = useState(false);
 
   async function getGarage() {
     const response = await fetch(`${BASE_URL}/garage?_page=${currentPage}&_limit=${CARS_PER_PAGE}`);
@@ -185,7 +191,7 @@ function App() {
     await getWinnersList();
   }
 
-  async function switchToDrive(id: number, velocity: number) {
+  async function switchToDrive(id: number, velocity: number, carName: string, carColor: string) {
     setCarsStatus((prev) => ({ ...prev,
       [id]: {
         status: `${prev[id].status} driving...`,
@@ -202,9 +208,13 @@ function App() {
             velocity: prev[id].velocity,
           } }));
         setIsResetAvailable(true);
-        if (winnerCarId === 0) {
-          winnerCarId = id;
-          await createWinner(winnerCarId, velocity);
+        if (winnerCarData.id === 0) {
+          winnerCarData.id = id;
+          winnerCarData.name = carName;
+          winnerCarData.color = carColor;
+          winnerCarData.time = Math.round((500 / velocity) * 100) / 100;
+          setIsWinnerPopUpActive(true);
+          await createWinner(id, winnerCarData.time);
           getWinnersList();
         }
         break;
@@ -221,7 +231,7 @@ function App() {
     }
   }
 
-  async function handleStartCar(id: number) {
+  async function handleStartCar(id: number, carName: string, carColor: string) {
     const response = await fetch(`${BASE_URL}/engine?id=${id}&status=started`, {
       method: 'PATCH',
     });
@@ -231,7 +241,7 @@ function App() {
         status: `status: engine on, velocity: ${carData.velocity}`,
         velocity: carData.velocity,
       } }));
-    switchToDrive(id, carData.velocity);
+    switchToDrive(id, carData.velocity, carName, carColor);
   }
 
   async function handleStopCar(id: number) {
@@ -251,7 +261,7 @@ function App() {
   async function handleStartAllCars() {
     setIsRaceAvailable(false);
     garage.forEach((car) => {
-      handleStartCar(car.id);
+      handleStartCar(car.id, car.name, car.color);
     });
   }
 
@@ -261,7 +271,10 @@ function App() {
       handleStopCar(car.id);
     });
     setIsRaceAvailable(true);
-    winnerCarId = 0;
+    setIsWinnerPopUpActive(false);
+    winnerCarData.id = 0;
+    winnerCarData.name = '';
+    winnerCarData.color = '';
   }
 
   return (
@@ -343,7 +356,7 @@ function App() {
             <button type="button" onClick={() => handleDeleteCar(car.id)}>delete</button>
             <button
               type="button"
-              onClick={() => handleStartCar(car.id)}
+              onClick={() => handleStartCar(car.id, car.name, car.color)}
               disabled={(!!carsStatus[car.id] && carsStatus[car.id].status.includes('driving'))}
             >start
             </button>
@@ -360,7 +373,8 @@ function App() {
           </div>
         ))}
       </div>
-      <div>Winner Pop Up
+      <div hidden={!isWinnerPopUpActive}>Winner Pop Up
+        <div>{winnerCarData.id} {winnerCarData.name} {winnerCarData.color}</div>
       </div>
       <div>Score tab
         <div>Winners pagination
