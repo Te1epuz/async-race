@@ -36,15 +36,28 @@ export function Winners({ winnersList, totalWinners }: Tprops) {
   return (
     <div>
       <div>Total winners: {totalWinners}</div>
-      {winnersList.map((winner: TWinner) => (
-        <div key={winner.id}>
-          <span>{winner.id} </span>
-          <div className={styles.car__img} style={{ backgroundColor: carsData[winner.id]?.color }} />
-          <span>{carsData[winner.id]?.name} </span>
-          <span>{winner.wins} </span>
-          <span>{winner.time} </span>
-        </div>
-      ))}
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Car</th>
+            <th>Name</th>
+            <th>Wins</th>
+            <th>Best time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {winnersList.map((winner: TWinner) => (
+            <tr key={winner.id}>
+              <td>{winner.id} </td>
+              <td className={styles.car__img} style={{ backgroundColor: carsData[winner.id]?.color }} />
+              <td>{carsData[winner.id]?.name} </td>
+              <td>{winner.wins} </td>
+              <td>{winner.time} </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
