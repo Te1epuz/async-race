@@ -262,7 +262,7 @@ function App() {
   async function handleStartAllCars() {
     setIsRaceAvailable(false);
     garage.forEach((car) => {
-      handleStartCar(car.id, car.name, car.color);
+      if (!carsStatus[car.id].status.includes('driving')) handleStartCar(car.id, car.name, car.color);
     });
   }
 
