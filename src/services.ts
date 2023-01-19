@@ -1,5 +1,5 @@
 import { BASE_URL } from './constances';
-import { TWinner } from './types';
+import { TWinner, TCar } from './types';
 
 export async function createWinner(id: number, winnersList: TWinner[]) {
   console.log('winner with id ', id, ' should be added');
@@ -28,6 +28,12 @@ export async function createWinner(id: number, winnersList: TWinner[]) {
       }),
     });
   }
+}
+
+export async function getCar(id: number) {
+  const response = await fetch(`${BASE_URL}/garage/${id}`);
+  const data: TCar = await response.json();
+  return data;
 }
 
 // export async function getWinnersList() {

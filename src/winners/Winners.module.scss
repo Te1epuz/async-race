@@ -1,0 +1,9 @@
+.car__img {
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+  mask-size: cover;
+  mask-position: center;
+  -webkit-mask-image: url(../car.svg);
+  mask-image: url(../car.svg);
+}

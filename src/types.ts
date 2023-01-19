@@ -3,3 +3,9 @@ export type TWinner = {
   wins: number;
   time: number;
 }
+
+export type TCar = {
+  name: string;
+  color: string;
+  id: number;
+}
