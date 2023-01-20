@@ -12,7 +12,6 @@ export async function getWinner(id: number) {
 
 export async function createWinner(id: number, newTime: number) {
   const winnerData = await getWinner(id);
-  console.log('winner with id ', id, ' and time ', newTime, ' should be added');
   if (!winnerData) {
     await fetch(`${BASE_URL}/winners`, {
       method: 'POST',

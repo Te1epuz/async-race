@@ -55,8 +55,8 @@ function App() {
   const [totalWinners, setTotalWinners] = useState('0');
   const [sortWinnersBy, setSortWinnersBy] = useState<'time' | 'wins' | 'id'>('time');
   const [sortWinnersDirection, setSortWinnersDirection] = useState<'ASC' | 'DESC'>('ASC');
-  const [currentWinnersPage, setCurrentWinnersPage] = useState(1);
   const [isWinnerPopUpActive, setIsWinnerPopUpActive] = useState(false);
+  const [currentWinnersPage, setCurrentWinnersPage] = useState(1);
   const [isGarageShown, setIsGarageShown] = useState(true);
 
   async function getGarage() {
@@ -98,21 +98,12 @@ function App() {
     setCurrentWinnersPage(newPage);
   }
 
-  // function handleClick(event: MouseEvent) {
-  //   console.log(event.target);
-  // }
-
   useEffect(() => {
-    console.log('useEffect proc');
-    // window.addEventListener('click', handleClick);
     handlePagination(currentPage);
     getGarage();
     getWinnersList();
     setEditCarName('');
     setEditCar(undefined);
-    // return () => {
-    //   window.removeEventListener('click', handleClick);
-    // };
   }, [currentPage, totalCars, currentWinnersPage, sortWinnersBy, sortWinnersDirection]);
 
   function generateRandomColor() {
@@ -177,7 +168,6 @@ function App() {
   }, [editCar]);
 
   async function handleGenerateCars(quantity: number) {
-    console.log(`generate ${quantity} cars`);
     for (let i = 1; i <= quantity; i += 1) {
       createNewCar(`${carModels[0][generateRandomInt(0, 14)]} ${carModels[1][generateRandomInt(0, 14)]}`,
         `#${generateRandomColor()}`);
@@ -219,8 +209,8 @@ function App() {
           setIsWinnerPopUpActive(true);
           await createWinner(id, winnerCarData.time);
           getWinnersList();
+          setIsResetAvailable(true);
         }
-        setIsResetAvailable(true);
         break;
       case 500:
         setCarsStatus((prev) => ({ ...prev,
@@ -245,7 +235,7 @@ function App() {
         status: `status: engine on, velocity: ${carData.velocity}`,
         velocity: carData.velocity,
       } }));
-    switchToDrive(id, carData.velocity, carName, carColor);
+    await switchToDrive(id, carData.velocity, carName, carColor);
   }
 
   async function handleStopCar(id: number) {
@@ -263,18 +253,19 @@ function App() {
   async function handleStartAllCars() {
     setIsRaceAvailable(false);
     isRaceActive = true;
-    garage.forEach((car) => {
-      if (!carsStatus[car.id]?.status.includes('driving')) handleStartCar(car.id, car.name, car.color);
+    await Promise.all(garage.map((car) =>
+      !carsStatus[car.id]?.status.includes('driving') ? handleStartCar(car.id, car.name, car.color) : ''));
+    setIsRaceAvailable((prev) => {
+      if (prev === false) setIsResetAvailable(true);
+      return prev;
     });
   }
 
   async function handleStopAllCars() {
     setIsResetAvailable(false);
-    garage.forEach((car) => {
-      handleStopCar(car.id);
-    });
-    setIsRaceAvailable(true);
     setIsWinnerPopUpActive(false);
+    await Promise.all(garage.map((car) => handleStopCar(car.id)));
+    setIsRaceAvailable(true);
     winnerCarData.id = 0;
     winnerCarData.name = '';
     winnerCarData.color = '';
@@ -318,7 +309,7 @@ function App() {
         </form>
         <button type="button" onClick={() => handleStartAllCars()} disabled={!isRaceAvailable}>race</button>
         <button type="button" onClick={() => handleStopAllCars()} disabled={!isResetAvailable}>reset</button>
-        <button type="button" onClick={() => handleGenerateCars(20)}>generate cars 20</button>
+        <button type="button" onClick={() => handleGenerateCars(10)}>generate cars 10</button>
         <button type="button" onClick={() => handleGenerateCars(100)}>generate cars 100</button>
 
         <div>Race track</div>
@@ -366,7 +357,11 @@ function App() {
             <button type="button" onClick={() => handleDeleteCar(car.id)}>delete</button>
             <button
               type="button"
-              onClick={() => handleStartCar(car.id, car.name, car.color)}
+              onClick={() => {
+                setIsResetAvailable(true);
+                setIsRaceAvailable(false);
+                handleStartCar(car.id, car.name, car.color);
+              }}
               disabled={(!!carsStatus[car.id] && carsStatus[car.id].status.includes('driving'))}
             >start
             </button>
