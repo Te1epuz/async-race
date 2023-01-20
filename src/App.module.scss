@@ -13,7 +13,7 @@
   }
 
   to {
-    transform: translateX(90vw);
+    transform: translateX(calc(100vw - 120px));
   }
 }
 

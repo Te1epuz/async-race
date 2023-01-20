@@ -326,14 +326,20 @@ function App() {
         <div>pagination
           <button
             type="button"
-            onClick={() => handlePagination(currentPage - 1)}
+            onClick={() => {
+              handlePagination(currentPage - 1);
+              handleStopAllCars();
+            }}
             disabled={!isRaceAvailable && !isResetAvailable}
           >-
           </button>
           <span>{currentPage}</span>
           <button
             type="button"
-            onClick={() => handlePagination(currentPage + 1)}
+            onClick={() => {
+              handlePagination(currentPage + 1);
+              handleStopAllCars();
+            }}
             disabled={!isRaceAvailable && !isResetAvailable}
           >+
           </button>
@@ -342,7 +348,7 @@ function App() {
           <div id={`car_id_${car.id}`} key={car.id}>
             <div>{car.id} {car.name} {car.color}</div>
             <div
-              className={`${styles.car__img} ${carsStatus[car.id] && carsStatus[car.id].velocity > 0 ?
+              className={`${styles.car__img} ${carsStatus[car.id] && carsStatus[car.id].status.includes('driving') ?
                 carsStatus[car.id].status.includes('broken') ? styles.car__img_broken : styles.car__img_drive
                 : ''
               }`}
