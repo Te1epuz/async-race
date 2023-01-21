@@ -14,6 +14,7 @@ function App() {
   return (
     <div className={styles.wrapper}>
       <Header
+        isGarageShown={isGarageShown}
         setIsGarageShown={setIsGarageShown}
       />
       <Garage

@@ -1,0 +1,39 @@
+.title {
+  text-transform: uppercase;
+  font-size: 8vw;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.buttons {
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.button {
+  font-size: 1.8vw;
+  border: 1px solid black;
+  padding: 0 15px;
+  cursor: pointer;
+}
+
+.button:hover {
+  border: 1px solid black;
+  transform: scale(1.02);
+}
+
+.button__left {
+  border-top-left-radius: 1vw;
+  border-bottom-left-radius: 1vw;
+}
+
+.button__right {
+  border-top-right-radius: 1vw;
+  border-bottom-right-radius: 1vw;
+}
+
+.button:disabled {
+  border: none;
+  border: 1px solid grey;
+  pointer-events: none;
+}

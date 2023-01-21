@@ -197,63 +197,65 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
 
   return (
     <div className={!isGarageShown ? styles.hidden : ''}>
-      Garage
-      <form onSubmit={onSubmitCreateHandler}>
-        <input
-          placeholder="enter new car name"
-          value={newCarName}
-          onChange={(event) => setNewCarName(event.target.value)}
-        />
-        <input
-          type="color"
-          value={newCarColor}
-          onChange={(event) => setNewCarColor(event.target.value)}
-        />
-        <button type="submit">create</button>
-      </form>
-      <form onSubmit={onSubmitUpdateHandler}>
-        <input
-          id="editname__input"
-          placeholder=""
-          value={editCarName}
-          onChange={(event) => setEditCarName(event.target.value)}
-        />
-        <input
-          type="color"
-          value={editCarColor}
-          onChange={(event) => setEditCarColor(event.target.value)}
-        />
-        <button type="submit">update</button>
-      </form>
-      <button type="button" onClick={() => handleStartAllCars()} disabled={!isRaceAvailable}>race</button>
-      <button type="button" onClick={() => handleStopAllCars()} disabled={!isResetAvailable}>reset</button>
-      <button type="button" onClick={() => handleGenerateCars(10)}>generate cars 10</button>
-      <button type="button" onClick={() => handleGenerateCars(100)}>generate cars 100</button>
-
-      <div>Race track</div>
-      <div>Total cars: {totalCars}</div>
-      <div>pagination
-        <button
-          type="button"
-          onClick={() => {
-            handlePagination(currentPage - 1);
-            handleStopAllCars();
-          }}
-          disabled={(!isRaceAvailable && !isResetAvailable) || currentPage === 1}
-        >-
-        </button>
-        <span>{currentPage}</span>
-        <button
-          type="button"
-          onClick={() => {
-            handlePagination(currentPage + 1);
-            handleStopAllCars();
-          }}
-          disabled={(!isRaceAvailable && !isResetAvailable) ||
-            currentPage === getAvailableMaxPages(totalCars, CARS_PER_PAGE)}
-        >+
-        </button>
+      <h2 className={styles.title}>Garage <span className={styles.title__span}>(total cars: {totalCars})</span></h2>
+      <div className={styles.control_panel}>
+        <div>
+          <form className={styles.form} onSubmit={onSubmitCreateHandler}>
+            <input
+              className={styles.input__text}
+              placeholder="Enter new car name"
+              value={newCarName}
+              onChange={(event) => setNewCarName(event.target.value)}
+            />
+            <input
+              className={styles.input__color}
+              type="color"
+              value={newCarColor}
+              onChange={(event) => setNewCarColor(event.target.value)}
+            />
+            <button type="submit" className={styles.input__button}>Create car</button>
+          </form>
+          <form className={styles.form} onSubmit={onSubmitUpdateHandler}>
+            <input
+              className={styles.input__text}
+              id="editname__input"
+              placeholder=""
+              value={editCarName}
+              onChange={(event) => setEditCarName(event.target.value)}
+            />
+            <input
+              className={styles.input__color}
+              type="color"
+              value={editCarColor}
+              onChange={(event) => setEditCarColor(event.target.value)}
+            />
+            <button type="submit" className={styles.input__button}>Update car</button>
+          </form>
+          <button type="button" onClick={() => handleGenerateCars(10)} className={styles.generate__btnLeft}>
+            generate 10 cars
+          </button>
+          <button type="button" onClick={() => handleGenerateCars(100)} className={styles.generate__btnRight}>
+            generate 100 cars
+          </button>
+        </div>
+        <div className={styles.control_race}>
+          <button
+            className={styles.race__button}
+            type="button"
+            onClick={() => handleStartAllCars()}
+            disabled={!isRaceAvailable}
+          >race
+          </button>
+          <button
+            className={styles.reset__button}
+            type="button"
+            onClick={() => handleStopAllCars()}
+            disabled={!isResetAvailable}
+          >reset
+          </button>
+        </div>
       </div>
+
       {garage.map((car) => (
         <div id={`car_id_${car.id}`} key={car.id}>
           <div>{car.id} {car.name} {car.color}</div>
@@ -296,6 +298,28 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
           </span>
         </div>
       ))}
+      <div>pagination
+        <button
+          type="button"
+          onClick={() => {
+            handlePagination(currentPage - 1);
+            handleStopAllCars();
+          }}
+          disabled={(!isRaceAvailable && !isResetAvailable) || currentPage === 1}
+        >-
+        </button>
+        <span>{currentPage}</span>
+        <button
+          type="button"
+          onClick={() => {
+            handlePagination(currentPage + 1);
+            handleStopAllCars();
+          }}
+          disabled={(!isRaceAvailable && !isResetAvailable) ||
+            currentPage === getAvailableMaxPages(totalCars, CARS_PER_PAGE)}
+        >+
+        </button>
+      </div>
       <div hidden={!isWinnerPopUpActive}>Winner Pop Up
         <div>{winnerCarData.id} {winnerCarData.name} {winnerCarData.color}</div>
         <button type="button" onClick={() => handleStopAllCars()} disabled={!isResetAvailable}>reset</button>

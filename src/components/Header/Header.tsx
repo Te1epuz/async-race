@@ -1,13 +1,31 @@
 import React from 'react';
 import styles from './Header.module.scss';
 
-export function Header({ setIsGarageShown } :
-  { setIsGarageShown: React.Dispatch<React.SetStateAction<boolean>> }) {
+type TProps = {
+  isGarageShown: boolean;
+  setIsGarageShown: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function Header({ isGarageShown, setIsGarageShown } : TProps) {
   return (
-    <header className={styles.header}>
-      <h1>Async Race</h1>
-      <button type="button" onClick={() => setIsGarageShown(true)}>to garage</button>
-      <button type="button" onClick={() => setIsGarageShown(false)}>to winners</button>
+    <header>
+      <h1 className={styles.title}>Async Race</h1>
+      <div className={styles.buttons}>
+        <button
+          className={`${styles.button} ${styles.button__left}`}
+          type="button"
+          onClick={() => setIsGarageShown(true)}
+          disabled={isGarageShown}
+        >Garage
+        </button>
+        <button
+          className={`${styles.button} ${styles.button__right}`}
+          type="button"
+          onClick={() => setIsGarageShown(false)}
+          disabled={!isGarageShown}
+        >Winners
+        </button>
+      </div>
     </header>
   );
 }

@@ -1,3 +1,102 @@
+.title {
+  text-transform: uppercase;
+  font-size: 3vw;
+  margin: 0;
+}
+
+.title__span {
+  font-weight: 400;
+  text-transform: lowercase;
+  font-size: 2vw;
+}
+
+.control_panel {
+  display: flex;
+}
+
+.form {
+  display: flex;
+  margin-bottom: 3px;
+}
+
+.input__text {
+  width: 150px;
+  height: 30px;
+  margin: 0;
+  padding: 0 10px;
+  border: 1px solid black;
+  box-sizing: border-box;
+  border-top-left-radius: 1vw;
+  border-bottom-left-radius: 1vw;
+}
+
+.input__color {
+  height: 30px;
+  width: 30px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid black;
+  cursor: pointer;
+}
+
+.input__button {
+  width: 100px;
+  height: 30px;
+  border: 1px solid black;
+  border-top-right-radius: 1vw;
+  border-bottom-right-radius: 1vw;
+  cursor: pointer;
+}
+
+.generate__btnLeft {
+  width: 140px;
+  height: 30px;
+  border: 1px solid black;
+  border-top-left-radius: 1vw;
+  border-bottom-left-radius: 1vw;
+  cursor: pointer;
+}
+
+.generate__btnRight {
+  width: 140px;
+  height: 30px;
+  border: 1px solid black;
+  border-top-right-radius: 1vw;
+  border-bottom-right-radius: 1vw;
+  cursor: pointer;
+}
+
+.control_race {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.race__button {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  cursor: pointer;
+  background-color: rgb(1, 216, 1);
+  font-size: 2vw;
+}
+
+.reset__button {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  cursor: pointer;
+  background-color: rgb(255, 2, 2);
+  font-size: 2vw;
+}
+
+.race__button:disabled,
+.reset__button:disabled {
+  pointer-events: none;
+  opacity: 50%;
+}
+
 .car__img {
   width: 80px;
   height: 40px;
