@@ -1,25 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { WINNERS_PER_PAGE } from '../../constances';
+import { fetchGetWinnersList } from '../../services/services';
 import { TWinner } from '../../types/types';
 import { WinnersTable } from './WinnersTable';
 
 type TProps = {
   isGarageShown: boolean;
-  setCurrentWinnersPage: React .Dispatch<React.SetStateAction<number>>;
   totalWinners: string;
-  currentWinnersPage: number;
   isRaceAvailable: boolean;
   isResetAvailable: boolean;
-  winnersList: TWinner [];
-  sortWinnersBy: 'time' | 'wins' | 'id';
-  setSortWinnersBy: React.Dispatch<React.SetStateAction<'time' | 'wins' | 'id'>>;
-  sortWinnersDirection: 'ASC' | 'DESC';
-  setSortWinnersDirection: React.Dispatch<React.SetStateAction<'ASC' | 'DESC'>>;
+  setTotalWinners: React.Dispatch<React.SetStateAction<string>>;
+  totalCars: string;
 }
 
-export function Winners({ isGarageShown, setCurrentWinnersPage, totalWinners, currentWinnersPage, isRaceAvailable,
-  isResetAvailable, winnersList, sortWinnersBy, setSortWinnersBy, sortWinnersDirection, setSortWinnersDirection,
-}: TProps) {
+export function Winners({ isGarageShown, totalWinners, isRaceAvailable, isResetAvailable, setTotalWinners,
+  totalCars }: TProps) {
+  const [winnersList, setWinnersList] = useState<TWinner[]>([]);
+  const [sortWinnersBy, setSortWinnersBy] = useState<'time' | 'wins' | 'id'>('time');
+  const [sortWinnersDirection, setSortWinnersDirection] = useState<'ASC' | 'DESC'>('ASC');
+  const [currentWinnersPage, setCurrentWinnersPage] = useState(1);
+
+  async function getWinnersList() {
+    const response = await fetchGetWinnersList(currentWinnersPage, sortWinnersBy, sortWinnersDirection);
+    const totalWinnersInHeader = response.headers.get('X-Total-Count');
+    if (totalWinnersInHeader) setTotalWinners(totalWinnersInHeader);
+    const winnersData = await response.json();
+    setWinnersList(winnersData);
+  }
+
   function handleWinnersPagination(page: number) {
     let newPage = page;
     const availableMaxPages = Math.ceil(Number(totalWinners) / WINNERS_PER_PAGE);
@@ -27,6 +35,11 @@ export function Winners({ isGarageShown, setCurrentWinnersPage, totalWinners, cu
     if (newPage < 1) newPage = 1;
     setCurrentWinnersPage(newPage);
   }
+
+  useEffect(() => {
+    handleWinnersPagination(currentWinnersPage);
+    getWinnersList();
+  }, [totalCars, totalWinners, currentWinnersPage, sortWinnersBy, sortWinnersDirection]);
 
   return (
     <div hidden={isGarageShown}>Winners
@@ -48,6 +61,7 @@ export function Winners({ isGarageShown, setCurrentWinnersPage, totalWinners, cu
       <div>Total winners: {totalWinners}</div>
       <WinnersTable
         winnersList={winnersList}
+        totalWinners={totalWinners}
         sortWinnersBy={sortWinnersBy}
         setSortWinnersBy={setSortWinnersBy}
         sortWinnersDirection={sortWinnersDirection}

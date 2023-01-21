@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { getCar } from '../../services/services';
 import { TCar, TWinner, TWinnersData } from '../../types/types';
-import styles from './WinnersTable.module.scss';
+import { WinnersTableRow } from './WinnersTableRow';
 
 type TProps = {
   winnersList: TWinner[];
+  totalWinners: string;
   sortWinnersBy: 'time' | 'wins' | 'id';
   setSortWinnersBy: React.Dispatch<React.SetStateAction<'time' | 'wins' | 'id'>>;
   sortWinnersDirection: 'ASC' | 'DESC';
   setSortWinnersDirection: React.Dispatch<React.SetStateAction<'ASC' | 'DESC'>>;
 }
 
-export function WinnersTable({ winnersList, sortWinnersBy, setSortWinnersBy,
+export function WinnersTable({ winnersList, totalWinners, sortWinnersBy, setSortWinnersBy,
   sortWinnersDirection, setSortWinnersDirection }: TProps) {
   const [carsData, setCarsData] = useState<TWinnersData>({});
 
@@ -38,7 +39,7 @@ export function WinnersTable({ winnersList, sortWinnersBy, setSortWinnersBy,
     winnersList.forEach((winner) => {
       getCarData(winner.id);
     });
-  }, [winnersList]);
+  }, [winnersList, totalWinners]);
 
   return (
     <table>
@@ -63,13 +64,11 @@ export function WinnersTable({ winnersList, sortWinnersBy, setSortWinnersBy,
       <tbody>
         {winnersList.length === 0 ? <tr><td colSpan={5}>No winners to display :(</td></tr> : ''}
         {winnersList.map((winner: TWinner) => (
-          <tr key={winner.id}>
-            <td>{winner.id} </td>
-            <td className={styles.car__img} style={{ backgroundColor: carsData[winner.id]?.color }} />
-            <td>{carsData[winner.id]?.name} </td>
-            <td>{winner.wins} </td>
-            <td>{winner.time} </td>
-          </tr>
+          <WinnersTableRow
+            key={winner.id}
+            winner={winner}
+            carsData={carsData}
+          />
         ))}
       </tbody>
     </table>

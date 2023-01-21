@@ -17,7 +17,6 @@ let isRaceActive = false;
 
 type TProps = {
   isGarageShown: boolean;
-  currentPage: number;
   totalCars: string;
   setTotalCars: React.Dispatch<React.SetStateAction<string>>;
   isRaceAvailable: boolean;
@@ -25,11 +24,10 @@ type TProps = {
   isResetAvailable: boolean;
   setIsResetAvailable: React.Dispatch<React.SetStateAction<boolean>>;
   setTotalWinners: React.Dispatch<React.SetStateAction<string>>;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export function Garage({ isGarageShown, currentPage, totalCars, setTotalCars, isRaceAvailable, setIsRaceAvailable,
-  isResetAvailable, setIsResetAvailable, setTotalWinners, setCurrentPage }: TProps) {
+export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable, setIsRaceAvailable,
+  isResetAvailable, setIsResetAvailable, setTotalWinners }: TProps) {
   const [garage, setGarage] = useState<TCar[]>([]);
   const [carsStatus, setCarsStatus] = useState<TCarsStatus>({});
   const [newCarName, setNewCarName] = useState('');
@@ -37,6 +35,7 @@ export function Garage({ isGarageShown, currentPage, totalCars, setTotalCars, is
   const [editCar, setEditCar] = useState<TCar>();
   const [editCarName, setEditCarName] = useState('');
   const [editCarColor, setEditCarColor] = useState('#000000');
+  const [currentPage, setCurrentPage] = useState(1);
   const [isWinnerPopUpActive, setIsWinnerPopUpActive] = useState(false);
 
   async function getGarage() {
@@ -136,7 +135,7 @@ export function Garage({ isGarageShown, currentPage, totalCars, setTotalCars, is
           winnerCarData.time = Math.round((500 / velocity) * 100) / 100;
           setIsWinnerPopUpActive(true);
           await createWinner(id, winnerCarData.time);
-          setTotalWinners((prev) => prev);
+          setTotalWinners((prev) => `${Number(prev) + 1}`);
           setIsResetAvailable(true);
         }
         break;

@@ -7,6 +7,9 @@ export async function getWinner(id: number) {
     const data: TWinner = await response.json();
     return data;
   }
+  if (response.status === 404) {
+    console.log('error 404 - no previous records in winners table on winning car');
+  }
   return undefined;
 }
 
