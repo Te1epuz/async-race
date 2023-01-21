@@ -5,14 +5,13 @@ import { WinnersTableRow } from './WinnersTableRow';
 
 type TProps = {
   winnersList: TWinner[];
-  totalWinners: string;
   sortWinnersBy: 'time' | 'wins' | 'id';
   setSortWinnersBy: React.Dispatch<React.SetStateAction<'time' | 'wins' | 'id'>>;
   sortWinnersDirection: 'ASC' | 'DESC';
   setSortWinnersDirection: React.Dispatch<React.SetStateAction<'ASC' | 'DESC'>>;
 }
 
-export function WinnersTable({ winnersList, totalWinners, sortWinnersBy, setSortWinnersBy,
+export function WinnersTable({ winnersList, sortWinnersBy, setSortWinnersBy,
   sortWinnersDirection, setSortWinnersDirection }: TProps) {
   const [carsData, setCarsData] = useState<TWinnersData>({});
 
@@ -39,7 +38,7 @@ export function WinnersTable({ winnersList, totalWinners, sortWinnersBy, setSort
     winnersList.forEach((winner) => {
       getCarData(winner.id);
     });
-  }, [winnersList, totalWinners]);
+  }, [winnersList]);
 
   return (
     <table>

@@ -63,7 +63,6 @@ export function Winners({ isGarageShown, totalWinners, isRaceAvailable, isResetA
       <div>Total winners: {totalWinners}</div>
       <WinnersTable
         winnersList={winnersList}
-        totalWinners={totalWinners}
         sortWinnersBy={sortWinnersBy}
         setSortWinnersBy={setSortWinnersBy}
         sortWinnersDirection={sortWinnersDirection}
