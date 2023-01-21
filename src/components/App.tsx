@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Header } from './Header/Header';
 import { Winners } from './Winners/Winners';
 import { Garage } from './Garage/Garage';
 import styles from './App.module.scss';
@@ -12,11 +13,9 @@ function App() {
 
   return (
     <div className={styles.wrapper}>
-      <header className={styles.header}>
-        Header
-        <button type="button" onClick={() => setIsGarageShown(true)}>to garage</button>
-        <button type="button" onClick={() => setIsGarageShown(false)}>to winners</button>
-      </header>
+      <Header
+        setIsGarageShown={setIsGarageShown}
+      />
       <Garage
         isGarageShown={isGarageShown}
         totalCars={totalCars}
