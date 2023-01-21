@@ -1,34 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import styles from './App.module.scss';
-import { BASE_URL, CARS_PER_PAGE, WINNERS_PER_PAGE } from './constances';
-import { TWinner } from './types';
-import { createWinner, deleteWinner } from './services';
-import { Winners } from './winners/Winners';
-
-type TCar = {
-  name: string;
-  color: string;
-  id: number;
-}
-
-type TCarsStatus = {
-  [index: number]: {
-    status: string;
-    velocity: number;
-  }
-};
-
-const carModels = [
-  ['Tesla', 'BMW', 'Mercedes', 'Opel', 'Skoda', 'Audi', 'Crysler', 'Dodge', 'Ford', 'Ferrari',
-    'Lamborghini', 'Peugeout', 'Fisker', 'Aston Martin', 'Lada'],
-  ['Model S', 'Model E', 'Model X', 'Model Y', '230i', '540d', 'Corsa', 'Octavia', 'Fabia', 'Rapid',
-    '300c', 'Viper', 'Mustang', 'Karma', 'Aventador']];
-
-function generateRandomInt(min: number, max: number) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+import { CARS_PER_PAGE, CAR_MODELS, WINNERS_PER_PAGE } from '../constances';
+import { TCar, TCarsStatus, TWinner } from '../types/types';
+import { createWinner, deleteWinner, fetchCreateNewCar, fetchGetGarage, fetchGetWinnersList, fetchHandleDeleteCar,
+  fetchHandleStartCar, fetchHandleStopCar, fetchSwitchToDrive, fetchUpdateCar } from '../services/services';
+import { generateRandomColor, generateRandomInt } from '../utilites/utilites';
+import { Winners } from './Winners/Winners';
 
 const winnerCarData = {
   id: 0,
@@ -60,7 +37,7 @@ function App() {
   const [isGarageShown, setIsGarageShown] = useState(true);
 
   async function getGarage() {
-    const response = await fetch(`${BASE_URL}/garage?_page=${currentPage}&_limit=${CARS_PER_PAGE}`);
+    const response = await fetchGetGarage(currentPage);
     const totalCarsInHeader = response.headers.get('X-Total-Count');
     if (totalCarsInHeader) setTotalCars(totalCarsInHeader);
     const data = await response.json();
@@ -68,14 +45,7 @@ function App() {
   }
 
   async function getWinnersList() {
-    const response = await fetch(
-      `${BASE_URL}/winners?_page=${currentWinnersPage}
-        &_limit=${WINNERS_PER_PAGE} &_sort=${sortWinnersBy}&_order=${sortWinnersDirection}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    const response = await fetchGetWinnersList(currentWinnersPage, sortWinnersBy, sortWinnersDirection);
     const totalWinnersInHeader = response.headers.get('X-Total-Count');
     if (totalWinnersInHeader) setTotalWinners(totalWinnersInHeader);
     const winnersData = await response.json();
@@ -84,45 +54,33 @@ function App() {
 
   function handlePagination(page: number) {
     let newPage = page;
-    if (newPage > Math.ceil(Number(totalCars)) / CARS_PER_PAGE) newPage = Math.ceil(Number(totalCars) / CARS_PER_PAGE);
+    const availableMaxPages = Math.ceil(Number(totalCars) / CARS_PER_PAGE);
+    if (newPage > availableMaxPages) newPage = availableMaxPages;
     if (newPage < 1) newPage = 1;
     setCurrentPage(newPage);
   }
 
   function handleWinnersPagination(page: number) {
     let newPage = page;
-    if (newPage > Math.ceil(Number(totalWinners)) / WINNERS_PER_PAGE) {
-      newPage = Math.ceil(Number(totalWinners) / WINNERS_PER_PAGE);
-    }
+    const availableMaxPages = Math.ceil(Number(totalWinners) / WINNERS_PER_PAGE);
+    if (newPage > availableMaxPages) newPage = availableMaxPages;
     if (newPage < 1) newPage = 1;
     setCurrentWinnersPage(newPage);
   }
 
   useEffect(() => {
     handlePagination(currentPage);
+    handleWinnersPagination(currentWinnersPage);
     getGarage();
     getWinnersList();
     setEditCarName('');
     setEditCar(undefined);
-  }, [currentPage, totalCars, currentWinnersPage, sortWinnersBy, sortWinnersDirection]);
-
-  function generateRandomColor() {
-    return Math.random().toString(16).slice(2, 8).toUpperCase();
-  }
+  }, [currentPage, totalCars, totalWinners, currentWinnersPage, sortWinnersBy, sortWinnersDirection]);
 
   async function createNewCar(carName: string, carColor: string) {
     setNewCarName('');
-    setNewCarColor(`#${generateRandomColor()}`);
-    const response = await fetch(`${BASE_URL}/garage`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: carName === '' ? 'Unnamed car' : carName,
-        color: carColor,
-      }),
-    });
+    setNewCarColor(generateRandomColor());
+    const response = await fetchCreateNewCar(carName, carColor);
     const carData = await response.json();
     setCarsStatus((prev) => ({ ...prev,
       [carData.id]: {
@@ -131,24 +89,16 @@ function App() {
       } }));
   }
 
-  function onSubmitCreateHandler(event: React.FormEvent<HTMLFormElement>) {
+  async function onSubmitCreateHandler(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    createNewCar(newCarName, newCarColor);
+    await createNewCar(newCarName, newCarColor);
     getGarage();
   }
 
   async function updateCar(car: TCar) {
-    await fetch(`${BASE_URL}/garage/${car.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: editCarName === '' ? 'Unnamed car' : editCarName,
-        color: editCarColor,
-      }),
-    });
+    await fetchUpdateCar(car.id, editCarName, editCarColor);
     setEditCarName('');
+    document.getElementById('editname__input')?.blur();
     setEditCar(undefined);
   }
 
@@ -164,21 +114,20 @@ function App() {
     if (editCar) {
       setEditCarName(editCar.name);
       setEditCarColor(editCar.color);
+      document.getElementById('editname__input')?.focus();
     }
   }, [editCar]);
 
   async function handleGenerateCars(quantity: number) {
     for (let i = 1; i <= quantity; i += 1) {
-      createNewCar(`${carModels[0][generateRandomInt(0, 14)]} ${carModels[1][generateRandomInt(0, 14)]}`,
-        `#${generateRandomColor()}`);
+      createNewCar(`${CAR_MODELS[0][generateRandomInt(0, 14)]} ${CAR_MODELS[1][generateRandomInt(0, 14)]}`,
+        generateRandomColor());
     }
     await getGarage();
   }
 
   async function handleDeleteCar(id: number) {
-    await fetch(`${BASE_URL}/garage/${id}`, {
-      method: 'DELETE',
-    });
+    await fetchHandleDeleteCar(id);
     await deleteWinner(id);
     await getGarage();
     await getWinnersList();
@@ -190,9 +139,7 @@ function App() {
         status: `${prev[id].status} driving...`,
         velocity: prev[id].velocity,
       } }));
-    const response = await fetch(`${BASE_URL}/engine?id=${id}&status=drive`, {
-      method: 'PATCH',
-    });
+    const response = await fetchSwitchToDrive(id);
     switch (response.status) {
       case 200:
         setCarsStatus((prev) => ({ ...prev,
@@ -226,9 +173,7 @@ function App() {
   }
 
   async function handleStartCar(id: number, carName: string, carColor: string) {
-    const response = await fetch(`${BASE_URL}/engine?id=${id}&status=started`, {
-      method: 'PATCH',
-    });
+    const response = await fetchHandleStartCar(id);
     const carData = await response.json();
     setCarsStatus((prev) => ({ ...prev,
       [id]: {
@@ -239,9 +184,7 @@ function App() {
   }
 
   async function handleStopCar(id: number) {
-    const response = await fetch(`${BASE_URL}/engine?id=${id}&status=stopped`, {
-      method: 'PATCH',
-    });
+    const response = await fetchHandleStopCar(id);
     const carData = await response.json();
     setCarsStatus((prev) => ({ ...prev,
       [id]: {
@@ -296,6 +239,7 @@ function App() {
         </form>
         <form onSubmit={onSubmitUpdateHandler}>
           <input
+            id="editname__input"
             placeholder=""
             value={editCarName}
             onChange={(event) => setEditCarName(event.target.value)}
@@ -382,31 +326,19 @@ function App() {
           <button type="button" onClick={() => handleStopAllCars()} disabled={!isResetAvailable}>reset</button>
         </div>
       </div>
-      <div hidden={isGarageShown}>Score tab
-        <div>Winners pagination
-          <button
-            type="button"
-            onClick={() => handleWinnersPagination(currentWinnersPage - 1)}
-            disabled={!isRaceAvailable && !isResetAvailable}
-          >-
-          </button>
-          <span>{currentWinnersPage}</span>
-          <button
-            type="button"
-            onClick={() => handleWinnersPagination(currentWinnersPage + 1)}
-            disabled={!isRaceAvailable && !isResetAvailable}
-          >+
-          </button>
-        </div>
-        <Winners
-          winnersList={winnersList}
-          totalWinners={totalWinners}
-          sortWinnersBy={sortWinnersBy}
-          setSortWinnersBy={setSortWinnersBy}
-          sortWinnersDirection={sortWinnersDirection}
-          setSortWinnersDirection={setSortWinnersDirection}
-        />
-      </div>
+      <Winners
+        isGarageShown={isGarageShown}
+        setCurrentWinnersPage={setCurrentWinnersPage}
+        totalWinners={totalWinners}
+        currentWinnersPage={currentWinnersPage}
+        isRaceAvailable={isRaceAvailable}
+        isResetAvailable={isResetAvailable}
+        winnersList={winnersList}
+        sortWinnersBy={sortWinnersBy}
+        setSortWinnersBy={setSortWinnersBy}
+        sortWinnersDirection={sortWinnersDirection}
+        setSortWinnersDirection={setSortWinnersDirection}
+      />
     </div>
   );
 }
