@@ -3,7 +3,7 @@ import { CARS_PER_PAGE, CAR_MODELS } from '../../constances';
 import { createWinner, deleteWinner, fetchCreateNewCar, fetchGetGarage, fetchHandleDeleteCar, fetchHandleStartCar,
   fetchHandleStopCar, fetchSwitchToDrive, fetchUpdateCar } from '../../services/services';
 import { TCar, TCarsStatus } from '../../types/types';
-import { generateRandomColor, generateRandomInt } from '../../utilites/utilites';
+import { generateRandomColor, generateRandomInt, getAvailableMaxPages } from '../../utilites/utilites';
 import styles from './Garage.module.scss';
 
 const winnerCarData = {
@@ -48,7 +48,7 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
 
   function handlePagination(page: number) {
     let newPage = page;
-    const availableMaxPages = Math.ceil(Number(totalCars) / CARS_PER_PAGE);
+    const availableMaxPages = getAvailableMaxPages(totalCars, CARS_PER_PAGE);
     if (newPage > availableMaxPages) newPage = availableMaxPages;
     if (newPage < 1) newPage = 1;
     setCurrentPage(newPage);
@@ -239,7 +239,7 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
             handlePagination(currentPage - 1);
             handleStopAllCars();
           }}
-          disabled={!isRaceAvailable && !isResetAvailable}
+          disabled={(!isRaceAvailable && !isResetAvailable) || currentPage === 1}
         >-
         </button>
         <span>{currentPage}</span>
@@ -249,7 +249,8 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
             handlePagination(currentPage + 1);
             handleStopAllCars();
           }}
-          disabled={!isRaceAvailable && !isResetAvailable}
+          disabled={(!isRaceAvailable && !isResetAvailable) ||
+            currentPage === getAvailableMaxPages(totalCars, CARS_PER_PAGE)}
         >+
         </button>
       </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { WINNERS_PER_PAGE } from '../../constances';
 import { fetchGetWinnersList } from '../../services/services';
 import { TWinner } from '../../types/types';
+import { getAvailableMaxPages } from '../../utilites/utilites';
 import { WinnersTable } from './WinnersTable';
 
 type TProps = {
@@ -30,7 +31,7 @@ export function Winners({ isGarageShown, totalWinners, isRaceAvailable, isResetA
 
   function handleWinnersPagination(page: number) {
     let newPage = page;
-    const availableMaxPages = Math.ceil(Number(totalWinners) / WINNERS_PER_PAGE);
+    const availableMaxPages = getAvailableMaxPages(totalWinners, WINNERS_PER_PAGE);
     if (newPage > availableMaxPages) newPage = availableMaxPages;
     if (newPage < 1) newPage = 1;
     setCurrentWinnersPage(newPage);
@@ -47,14 +48,15 @@ export function Winners({ isGarageShown, totalWinners, isRaceAvailable, isResetA
         <button
           type="button"
           onClick={() => handleWinnersPagination(currentWinnersPage - 1)}
-          disabled={!isRaceAvailable && !isResetAvailable}
+          disabled={(!isRaceAvailable && !isResetAvailable) || currentWinnersPage === 1}
         >-
         </button>
         <span>{currentWinnersPage}</span>
         <button
           type="button"
           onClick={() => handleWinnersPagination(currentWinnersPage + 1)}
-          disabled={!isRaceAvailable && !isResetAvailable}
+          disabled={(!isRaceAvailable && !isResetAvailable) ||
+            currentWinnersPage === getAvailableMaxPages(totalWinners, WINNERS_PER_PAGE)}
         >+
         </button>
       </div>

@@ -7,3 +7,7 @@ export function generateRandomInt(min: number, max: number) {
 export function generateRandomColor() {
   return `#${Math.random().toString(16).slice(2, 8).toUpperCase()}`;
 }
+
+export function getAvailableMaxPages(elementsTotal: string, elementsPerPage: number) {
+  return Math.ceil(Number(elementsTotal) / elementsPerPage);
+}
