@@ -3,7 +3,7 @@ import { getCar } from '../../services/services';
 import { TCar, TWinner, TWinnersData } from '../../types/types';
 import styles from './WinnersTable.module.scss';
 
-type Tprops = {
+type TProps = {
   winnersList: TWinner[];
   sortWinnersBy: 'time' | 'wins' | 'id';
   setSortWinnersBy: React.Dispatch<React.SetStateAction<'time' | 'wins' | 'id'>>;
@@ -12,7 +12,7 @@ type Tprops = {
 }
 
 export function WinnersTable({ winnersList, sortWinnersBy, setSortWinnersBy,
-  sortWinnersDirection, setSortWinnersDirection }: Tprops) {
+  sortWinnersDirection, setSortWinnersDirection }: TProps) {
   const [carsData, setCarsData] = useState<TWinnersData>({});
 
   async function getCarData(id: number) {

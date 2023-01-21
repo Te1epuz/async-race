@@ -3,7 +3,7 @@ import { WINNERS_PER_PAGE } from '../../constances';
 import { TWinner } from '../../types/types';
 import { WinnersTable } from './WinnersTable';
 
-type Tprops = {
+type TProps = {
   isGarageShown: boolean;
   setCurrentWinnersPage: React .Dispatch<React.SetStateAction<number>>;
   totalWinners: string;
@@ -19,7 +19,7 @@ type Tprops = {
 
 export function Winners({ isGarageShown, setCurrentWinnersPage, totalWinners, currentWinnersPage, isRaceAvailable,
   isResetAvailable, winnersList, sortWinnersBy, setSortWinnersBy, sortWinnersDirection, setSortWinnersDirection,
-}: Tprops) {
+}: TProps) {
   function handleWinnersPagination(page: number) {
     let newPage = page;
     const availableMaxPages = Math.ceil(Number(totalWinners) / WINNERS_PER_PAGE);
