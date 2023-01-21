@@ -1,13 +1,17 @@
+.wrapper {
+  position: relative;
+}
+
 .title {
   text-transform: uppercase;
-  font-size: 3vw;
+  font-size: 40px;
   margin: 0;
 }
 
 .title__span {
   font-weight: 400;
   text-transform: lowercase;
-  font-size: 2vw;
+  font-size: 30px;
 }
 
 .control_panel {
@@ -48,6 +52,13 @@
   cursor: pointer;
 }
 
+.input__text:disabled,
+.input__color:disabled,
+.input__button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .generate__btnLeft {
   width: 140px;
   height: 30px;
@@ -70,7 +81,7 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 1vw;
 }
 
 .race__button {
@@ -79,7 +90,7 @@
   border-radius: 50%;
   cursor: pointer;
   background-color: rgb(1, 216, 1);
-  font-size: 2vw;
+  font-size: 35px;
 }
 
 .reset__button {
@@ -88,13 +99,26 @@
   border-radius: 50%;
   cursor: pointer;
   background-color: rgb(255, 2, 2);
-  font-size: 2vw;
+  font-size: 35px;
+}
+
+.race__button:hover,
+.reset__button:hover {
+  transform: scale(0.98);
 }
 
 .race__button:disabled,
 .reset__button:disabled {
   pointer-events: none;
   opacity: 50%;
+}
+
+.car__block {
+  border-top: 1px solid lightblue;
+  margin-top: 5px;
+  background-image: url(../../img/gates.svg);
+  background-repeat: no-repeat;
+  background-position: right 100px center;
 }
 
 .car__img {
@@ -126,7 +150,116 @@
   animation-play-state: paused;
 }
 
+.car__title {
+  display: flex;
+  align-items: center;
+}
+
+.btn__edit,
+.btn__delete {
+  border: none;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn__edit:hover {
+  transform: scale(1.2);
+}
+
+.btn__delete:hover {
+  transform: scale(1.2);
+  color: red;
+}
+
 .hidden {
   height: 0;
   overflow: hidden;
+}
+
+.pagination {
+  width: fit-content;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.pagination__button {
+  font-size: 20px;
+  border: 1px solid black;
+  padding: 0;
+  cursor: pointer;
+  width: 35px;
+}
+
+.pagination__button:hover {
+  border: 1px solid black;
+  transform: scale(1.02);
+}
+
+.pagination__left {
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+.pagination__right {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.pagination__button:disabled {
+  border: none;
+  border: 1px solid grey;
+  pointer-events: none;
+}
+
+.pagination__number {
+  width: 25px;
+  text-align: center;
+}
+
+.popup {
+  background: white;
+  background-image: url(../../img/flags.svg);
+  background-repeat: no-repeat;
+  background-size: 300px;
+  background-position: center top;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid black;
+  padding: 20px;
+  padding-top: 150px;
+}
+
+.popup__text {
+  font-size: 30px;
+  margin-bottom: 1px;
+}
+
+.popup__img {
+  width: 140px;
+  height: 80px;
+  mask-size: cover;
+  mask-position: center;
+  -webkit-mask-image: url(../../img/car.svg);
+  mask-image: url(../../img/car.svg);
+  margin: 0 auto;
+  margin-bottom: 10px;
+}
+
+.popup__button {
+  font-size: 20px;
+  border: 1px solid black;
+  padding: 0 20px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  border-radius: 5px;
+}
+
+.popup__button:hover {
+  border: 1px solid black;
+  transform: scale(1.02);
 }

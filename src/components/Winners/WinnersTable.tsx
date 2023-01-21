@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getCar } from '../../services/services';
 import { TCar, TWinner, TWinnersData } from '../../types/types';
 import { WinnersTableRow } from './WinnersTableRow';
+import styles from './WinnersTable.module.scss';
 
 type TProps = {
   winnersList: TWinner[];
@@ -41,20 +42,23 @@ export function WinnersTable({ winnersList, sortWinnersBy, setSortWinnersBy,
   }, [winnersList]);
 
   return (
-    <table>
+    <table className={styles.table}>
       <thead>
         <tr>
           <th
+            className={styles.header__clickable}
             onClick={() => handleChangeSortBy('id')}
           >#{sortWinnersBy === 'id' ? sortWinnersDirection === 'ASC' ? '▾' : '▴' : ''}
           </th>
           <th>Car</th>
           <th>Name</th>
           <th
+            className={styles.header__clickable}
             onClick={() => handleChangeSortBy('wins')}
           >Wins{sortWinnersBy === 'wins' ? sortWinnersDirection === 'ASC' ? '▾' : '▴' : ''}
           </th>
           <th
+            className={styles.header__clickable}
             onClick={() => handleChangeSortBy('time')}
           >Best time{sortWinnersBy === 'time' ? sortWinnersDirection === 'ASC' ? '▾' : '▴' : ''}
           </th>

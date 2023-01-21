@@ -4,6 +4,7 @@ import { fetchGetWinnersList } from '../../services/services';
 import { TWinner } from '../../types/types';
 import { getAvailableMaxPages } from '../../utilites/utilites';
 import { WinnersTable } from './WinnersTable';
+import styles from './Winners.module.scss';
 
 type TProps = {
   isGarageShown: boolean;
@@ -43,24 +44,8 @@ export function Winners({ isGarageShown, totalWinners, isRaceAvailable, isResetA
   }, [totalCars, totalWinners, currentWinnersPage, sortWinnersBy, sortWinnersDirection]);
 
   return (
-    <div hidden={isGarageShown}>Winners
-      <div>pagination
-        <button
-          type="button"
-          onClick={() => handleWinnersPagination(currentWinnersPage - 1)}
-          disabled={(!isRaceAvailable && !isResetAvailable) || currentWinnersPage === 1}
-        >-
-        </button>
-        <span>{currentWinnersPage}</span>
-        <button
-          type="button"
-          onClick={() => handleWinnersPagination(currentWinnersPage + 1)}
-          disabled={(!isRaceAvailable && !isResetAvailable) ||
-            currentWinnersPage === getAvailableMaxPages(totalWinners, WINNERS_PER_PAGE)}
-        >+
-        </button>
-      </div>
-      <div>Total winners: {totalWinners}</div>
+    <div hidden={isGarageShown}>
+      <h2 className={styles.title}>Total winners: {totalWinners}</h2>
       <WinnersTable
         winnersList={winnersList}
         sortWinnersBy={sortWinnersBy}
@@ -68,6 +53,24 @@ export function Winners({ isGarageShown, totalWinners, isRaceAvailable, isResetA
         sortWinnersDirection={sortWinnersDirection}
         setSortWinnersDirection={setSortWinnersDirection}
       />
+      <div className={styles.pagination}>
+        <button
+          className={`${styles.pagination__button} ${styles.pagination__left}`}
+          type="button"
+          onClick={() => handleWinnersPagination(currentWinnersPage - 1)}
+          disabled={(!isRaceAvailable && !isResetAvailable) || currentWinnersPage === 1}
+        >-
+        </button>
+        <div className={styles.pagination__number}>{currentWinnersPage}</div>
+        <button
+          className={`${styles.pagination__button} ${styles.pagination__right}`}
+          type="button"
+          onClick={() => handleWinnersPagination(currentWinnersPage + 1)}
+          disabled={(!isRaceAvailable && !isResetAvailable) ||
+            currentWinnersPage === getAvailableMaxPages(totalWinners, WINNERS_PER_PAGE)}
+        >+
+        </button>
+      </div>
     </div>
   );
 }

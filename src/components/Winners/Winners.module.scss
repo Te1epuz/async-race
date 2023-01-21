@@ -1,39 +1,45 @@
 .title {
-  text-transform: uppercase;
-  font-size: 70px;
   text-align: center;
-  margin: 0 auto;
+  font-size: 36px;
 }
 
-.buttons {
+.pagination {
   width: fit-content;
   margin: 0 auto;
+  display: flex;
+  align-items: center;
 }
 
-.button {
-  font-size: 30px;
+.pagination__button {
+  font-size: 20px;
   border: 1px solid black;
-  padding: 0 15px;
+  padding: 0;
   cursor: pointer;
+  width: 35px;
 }
 
-.button:hover {
+.pagination__button:hover {
   border: 1px solid black;
   transform: scale(1.02);
 }
 
-.button__left {
+.pagination__left {
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
 }
 
-.button__right {
+.pagination__right {
   border-top-right-radius: 20px;
   border-bottom-right-radius: 20px;
 }
 
-.button:disabled {
+.pagination__button:disabled {
   border: none;
   border: 1px solid grey;
   pointer-events: none;
+}
+
+.pagination__number {
+  width: 25px;
+  text-align: center;
 }

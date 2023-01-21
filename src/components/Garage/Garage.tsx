@@ -196,7 +196,7 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
   }
 
   return (
-    <div className={!isGarageShown ? styles.hidden : ''}>
+    <div className={`${styles.wrapper} ${!isGarageShown ? styles.hidden : ''}`}>
       <h2 className={styles.title}>Garage <span className={styles.title__span}>(total cars: {totalCars})</span></h2>
       <div className={styles.control_panel}>
         <div>
@@ -222,14 +222,16 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
               placeholder=""
               value={editCarName}
               onChange={(event) => setEditCarName(event.target.value)}
+              disabled={!editCar}
             />
             <input
               className={styles.input__color}
               type="color"
               value={editCarColor}
               onChange={(event) => setEditCarColor(event.target.value)}
+              disabled={!editCar}
             />
-            <button type="submit" className={styles.input__button}>Update car</button>
+            <button type="submit" className={styles.input__button} disabled={!editCar}>Update car</button>
           </form>
           <button type="button" onClick={() => handleGenerateCars(10)} className={styles.generate__btnLeft}>
             generate 10 cars
@@ -257,8 +259,12 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
       </div>
 
       {garage.map((car) => (
-        <div id={`car_id_${car.id}`} key={car.id}>
-          <div>{car.id} {car.name} {car.color}</div>
+        <div id={`car_id_${car.id}`} key={car.id} className={styles.car__block}>
+          <div className={styles.car__title}>
+            <div>{car.id} {car.name}</div>
+            <button type="button" onClick={() => setEditCar(car)} className={styles.btn__edit}>✎</button>
+            <button type="button" onClick={() => handleDeleteCar(car.id)} className={styles.btn__delete}>✘</button>
+          </div>
           <div
             className={`${styles.car__img} ${carsStatus[car.id] && carsStatus[car.id].status.includes('driving') ?
               carsStatus[car.id].status.includes('broken') ? styles.car__img_broken : styles.car__img_drive
@@ -274,8 +280,6 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
                 backgroundColor: car.color,
               }}
           />
-          <button type="button" onClick={() => setEditCar(car)}>edit</button>
-          <button type="button" onClick={() => handleDeleteCar(car.id)}>delete</button>
           <button
             type="button"
             onClick={() => {
@@ -292,14 +296,15 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
             disabled={(!carsStatus[car.id] || carsStatus[car.id].status.includes('stopped'))}
           >stop
           </button>
-          <span id={`car_id_${car.id}_info`}>{
+          {/* <span id={`car_id_${car.id}_info`}>{
             carsStatus[car.id] ? carsStatus[car.id].status : 'status: parked '
           }
-          </span>
+          </span> */}
         </div>
       ))}
-      <div>pagination
+      <div className={styles.pagination}>
         <button
+          className={`${styles.pagination__button} ${styles.pagination__left}`}
           type="button"
           onClick={() => {
             handlePagination(currentPage - 1);
@@ -308,8 +313,9 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
           disabled={(!isRaceAvailable && !isResetAvailable) || currentPage === 1}
         >-
         </button>
-        <span>{currentPage}</span>
+        <div className={styles.pagination__number}>{currentPage}</div>
         <button
+          className={`${styles.pagination__button} ${styles.pagination__right}`}
           type="button"
           onClick={() => {
             handlePagination(currentPage + 1);
@@ -320,9 +326,18 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
         >+
         </button>
       </div>
-      <div hidden={!isWinnerPopUpActive}>Winner Pop Up
-        <div>{winnerCarData.id} {winnerCarData.name} {winnerCarData.color}</div>
-        <button type="button" onClick={() => handleStopAllCars()} disabled={!isResetAvailable}>reset</button>
+      <div className={styles.popup} hidden={!isWinnerPopUpActive}>
+        <div className={styles.popup__text}>
+          {winnerCarData.name} finished 1st in {winnerCarData.time}s !!!
+        </div>
+        <div className={styles.popup__img} style={{ backgroundColor: winnerCarData.color }} />
+        <button
+          className={styles.popup__button}
+          type="button"
+          onClick={() => handleStopAllCars()}
+          disabled={!isResetAvailable}
+        >reset
+        </button>
       </div>
     </div>
   );
