@@ -1,2 +1,2 @@
 Hello.
-You need to run locally this server https://github.com/mikhama/async-race-api to check this SPA :(
+You need to run this server https://github.com/mikhama/async-race-api locally to check this SPA :(
