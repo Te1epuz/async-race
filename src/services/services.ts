@@ -13,9 +13,22 @@ export async function getWinner(id: number) {
   return undefined;
 }
 
+async function fetchGetAllWinnersList() {
+  const response = await fetch(
+    `${BASE_URL}/winners?_page=1&_limit=999&_sort=id&_order=ASC`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  const allWinnersData = await response.json();
+  return allWinnersData;
+}
+
 export async function createWinner(id: number, newTime: number) {
-  const winnerData = await getWinner(id);
-  if (!winnerData) {
+  const response: TWinner[] = await fetchGetAllWinnersList();
+  const filteredResponse = response.filter((entry) => entry.id === id);
+  if (filteredResponse.length === 0) {
     await fetch(`${BASE_URL}/winners`, {
       method: 'POST',
       headers: {
@@ -28,23 +41,30 @@ export async function createWinner(id: number, newTime: number) {
       }),
     });
   } else {
-    await fetch(`${BASE_URL}/winners/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        wins: winnerData.wins + 1,
-        time: newTime < winnerData.time ? newTime : winnerData.time,
-      }),
-    });
+    const winnerData = await getWinner(id);
+    if (winnerData) {
+      await fetch(`${BASE_URL}/winners/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          wins: winnerData.wins + 1,
+          time: newTime < winnerData.time ? newTime : winnerData.time,
+        }),
+      });
+    }
   }
 }
 
 export async function deleteWinner(id: number) {
-  await fetch(`${BASE_URL}/winners/${id}`, {
-    method: 'DELETE',
-  });
+  const response: TWinner[] = await fetchGetAllWinnersList();
+  const filteredResponse = response.filter((entry) => entry.id === id);
+  if (filteredResponse.length > 0) {
+    await fetch(`${BASE_URL}/winners/${id}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export async function getCar(id: number) {
