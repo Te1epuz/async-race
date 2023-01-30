@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { CARS_PER_PAGE, CAR_MODELS } from '../../constances';
-import { createWinner, deleteWinner, fetchCreateNewCar, fetchGetGarage, fetchHandleDeleteCar, fetchHandleStartCar,
-  fetchHandleStopCar, fetchSwitchToDrive, fetchUpdateCar } from '../../services/services';
-import { TCar, TCarsStatus } from '../../types/types';
+import {
+  createWinner,
+  deleteWinner,
+  fetchCreateNewCar,
+  fetchGetGarage,
+  fetchHandleDeleteCar,
+  fetchHandleStartCar,
+  fetchHandleStopCar,
+  fetchSwitchToDrive,
+  fetchUpdateCar,
+} from '../../services/services';
+import { TCar, TCarsStatus, TEngineData } from '../../types/types';
 import { generateRandomColor, generateRandomInt, getAvailableMaxPages } from '../../utilites/utilites';
 import styles from './Garage.module.scss';
 
@@ -24,10 +33,18 @@ type TProps = {
   isResetAvailable: boolean;
   setIsResetAvailable: React.Dispatch<React.SetStateAction<boolean>>;
   setTotalWinners: React.Dispatch<React.SetStateAction<string>>;
-}
+};
 
-export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable, setIsRaceAvailable,
-  isResetAvailable, setIsResetAvailable, setTotalWinners }: TProps) {
+export function Garage({
+  isGarageShown,
+  totalCars,
+  setTotalCars,
+  isRaceAvailable,
+  setIsRaceAvailable,
+  isResetAvailable,
+  setIsResetAvailable,
+  setTotalWinners,
+}: TProps) {
   const [garage, setGarage] = useState<TCar[]>([]);
   const [carsStatus, setCarsStatus] = useState<TCarsStatus>({});
   const [newCarName, setNewCarName] = useState('');
@@ -42,8 +59,9 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
     const response = await fetchGetGarage(currentPage);
     const totalCarsInHeader = response.headers.get('X-Total-Count');
     if (totalCarsInHeader) setTotalCars(totalCarsInHeader);
-    const data = await response.json();
-    setGarage(data);
+    // const data = await response.json() as Promise<TCar[]>;
+    // setGarage(data);
+    response.json().then((data: TCar[]) => setGarage(data));
   }
 
   function handlePagination(page: number) {
@@ -63,13 +81,26 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
     setNewCarName('');
     setNewCarColor(generateRandomColor());
     const response = await fetchCreateNewCar(carName, carColor);
-    const carData = await response.json();
-    setCarsStatus((prev) => ({ ...prev,
-      [carData.id]: {
-        status: `${carData.id} status: stopped!?`,
-        velocity: 0,
-      } }));
+    // const carData = await response.json();
+    // setCarsStatus((prev) => ({
+    //   ...prev,
+    //   [carData.id]: {
+    //     status: `${carData.id} status: stopped!?`,
+    //     velocity: 0,
+    //   },
+    // }));
+
+    response.json().then((carData: TCar) => {
+      setCarsStatus((prev) => ({
+        ...prev,
+        [carData.id]: {
+          status: `${carData.id} status: stopped!?`,
+          velocity: 0,
+        },
+      }));
+    });
   }
+
   async function onSubmitCreateHandler(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     await createNewCar(newCarName, newCarColor);
@@ -101,8 +132,10 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
 
   async function handleGenerateCars(quantity: number) {
     for (let i = 1; i <= quantity; i += 1) {
-      createNewCar(`${CAR_MODELS[0][generateRandomInt(0, 14)]} ${CAR_MODELS[1][generateRandomInt(0, 14)]}`,
-        generateRandomColor());
+      createNewCar(
+        `${CAR_MODELS[0][generateRandomInt(0, 14)]} ${CAR_MODELS[1][generateRandomInt(0, 14)]}`,
+        generateRandomColor(),
+      );
     }
     await getGarage();
   }
@@ -114,19 +147,23 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
   }
 
   async function switchToDrive(id: number, velocity: number, carName: string, carColor: string) {
-    setCarsStatus((prev) => ({ ...prev,
+    setCarsStatus((prev) => ({
+      ...prev,
       [id]: {
         status: `${prev[id].status} driving...`,
         velocity: prev[id].velocity,
-      } }));
+      },
+    }));
     const response = await fetchSwitchToDrive(id);
     switch (response.status) {
       case 200:
-        setCarsStatus((prev) => ({ ...prev,
+        setCarsStatus((prev) => ({
+          ...prev,
           [id]: {
             status: `${prev[id].status} finished!`,
             velocity: prev[id].velocity,
-          } }));
+          },
+        }));
         if (winnerCarData.id === 0 && isRaceActive === true) {
           isRaceActive = false;
           winnerCarData.id = id;
@@ -140,11 +177,13 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
         }
         break;
       case 500:
-        setCarsStatus((prev) => ({ ...prev,
+        setCarsStatus((prev) => ({
+          ...prev,
           [id]: {
             status: `${prev[id].status}, car broken :(`,
             velocity: prev[id].velocity,
-          } }));
+          },
+        }));
         break;
       default:
         console.log(response.statusText);
@@ -154,30 +193,55 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
 
   async function handleStartCar(id: number, carName: string, carColor: string) {
     const response = await fetchHandleStartCar(id);
-    const carData = await response.json();
-    setCarsStatus((prev) => ({ ...prev,
-      [id]: {
-        status: `status: engine on, velocity: ${carData.velocity}`,
-        velocity: carData.velocity,
-      } }));
-    await switchToDrive(id, carData.velocity, carName, carColor);
+    // const carData = await response.json();
+    // setCarsStatus((prev) => ({ ...prev,
+    //   [id]: {
+    //     status: `status: engine on, velocity: ${carData.velocity}`,
+    //     velocity: carData.velocity,
+    //   } }));
+    // await switchToDrive(id, carData.velocity, carName, carColor);
+
+    response.json().then((engineData: TEngineData) => {
+      setCarsStatus((prev) => ({
+        ...prev,
+        [id]: {
+          status: `status: engine on, velocity: ${engineData.velocity}`,
+          velocity: engineData.velocity,
+        },
+      }));
+      switchToDrive(id, engineData.velocity, carName, carColor);
+    });
   }
 
   async function handleStopCar(id: number) {
     const response = await fetchHandleStopCar(id);
-    const carData = await response.json();
-    setCarsStatus((prev) => ({ ...prev,
-      [id]: {
-        status: prev[id] ? `status: engine off, velocity: ${carData.velocity}, stopped!` : 'stopped!!',
-        velocity: 0,
-      } }));
+    // const carData = await response.json();
+    // setCarsStatus((prev) => ({
+    //   ...prev,
+    //   [id]: {
+    //     status: prev[id] ? `status: engine off, velocity: ${carData.velocity}, stopped!` : 'stopped!!',
+    //     velocity: 0,
+    //   },
+    // }));
+    response.json().then((enineData: TEngineData) => {
+      setCarsStatus((prev) => ({
+        ...prev,
+        [id]: {
+          status: prev[id] ? `status: engine off, velocity: ${enineData.velocity}, stopped!` : 'stopped!!',
+          velocity: 0,
+        },
+      }));
+    });
   }
 
   async function handleStartAllCars() {
     setIsRaceAvailable(false);
     isRaceActive = true;
-    await Promise.all(garage.map((car) =>
-      !carsStatus[car.id]?.status.includes('driving') ? handleStartCar(car.id, car.name, car.color) : ''));
+    await Promise.all(
+      garage.map((car) =>
+        !carsStatus[car.id]?.status.includes('driving') ? handleStartCar(car.id, car.name, car.color) : '',
+      ),
+    );
     setIsRaceAvailable((prev) => {
       if (prev === false) setIsResetAvailable(true);
       return prev;
@@ -197,7 +261,9 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
 
   return (
     <div className={`${styles.wrapper} ${!isGarageShown ? styles.hidden : ''}`}>
-      <h2 className={styles.title}>Garage <span className={styles.title__span}>(total cars: {totalCars})</span></h2>
+      <h2 className={styles.title}>
+        Garage <span className={styles.title__span}>(total cars: {totalCars})</span>
+      </h2>
       <div className={styles.control_panel}>
         <div>
           <form className={styles.form} onSubmit={onSubmitCreateHandler}>
@@ -213,7 +279,9 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
               value={newCarColor}
               onChange={(event) => setNewCarColor(event.target.value)}
             />
-            <button type="submit" className={styles.input__button}>Create car</button>
+            <button type="submit" className={styles.input__button}>
+              Create car
+            </button>
           </form>
           <form className={styles.form} onSubmit={onSubmitUpdateHandler}>
             <input
@@ -231,7 +299,9 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
               onChange={(event) => setEditCarColor(event.target.value)}
               disabled={!editCar}
             />
-            <button type="submit" className={styles.input__button} disabled={!editCar}>Update car</button>
+            <button type="submit" className={styles.input__button} disabled={!editCar}>
+              Update car
+            </button>
           </form>
           <button type="button" onClick={() => handleGenerateCars(10)} className={styles.generate__btnLeft}>
             generate 10 cars
@@ -246,14 +316,16 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
             type="button"
             onClick={() => handleStartAllCars()}
             disabled={!isRaceAvailable}
-          >race
+          >
+            race
           </button>
           <button
             className={styles.reset__button}
             type="button"
             onClick={() => handleStopAllCars()}
             disabled={!isResetAvailable}
-          >reset
+          >
+            reset
           </button>
         </div>
       </div>
@@ -261,24 +333,34 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
       {garage.map((car) => (
         <div id={`car_id_${car.id}`} key={car.id} className={styles.car__block}>
           <div className={styles.car__title}>
-            <div>{car.id} {car.name}</div>
-            <button type="button" onClick={() => setEditCar(car)} className={styles.btn__edit}>✎</button>
-            <button type="button" onClick={() => handleDeleteCar(car.id)} className={styles.btn__delete}>✘</button>
+            <div>
+              {car.id} {car.name}
+            </div>
+            <button type="button" onClick={() => setEditCar(car)} className={styles.btn__edit}>
+              ✎
+            </button>
+            <button type="button" onClick={() => handleDeleteCar(car.id)} className={styles.btn__delete}>
+              ✘
+            </button>
           </div>
           <div
-            className={`${styles.car__img} ${carsStatus[car.id] && carsStatus[car.id].status.includes('driving') ?
-              carsStatus[car.id].status.includes('broken') ? styles.car__img_broken : styles.car__img_drive
-              : ''
+            className={`${styles.car__img} ${
+              carsStatus[car.id] && carsStatus[car.id].status.includes('driving')
+                ? carsStatus[car.id].status.includes('broken')
+                  ? styles.car__img_broken
+                  : styles.car__img_drive
+                : ''
             }`}
-            style={carsStatus[car.id] ?
-              {
-                backgroundColor: car.color,
-                animationDuration: `${(carsStatus[car.id].velocity > 0 ?
-                  (500 / carsStatus[car.id].velocity) : 0)}s`,
-              }
-              : {
-                backgroundColor: car.color,
-              }}
+            style={
+              carsStatus[car.id]
+                ? {
+                    backgroundColor: car.color,
+                    animationDuration: `${carsStatus[car.id].velocity > 0 ? 500 / carsStatus[car.id].velocity : 0}s`,
+                  }
+                : {
+                    backgroundColor: car.color,
+                  }
+            }
           />
           <button
             type="button"
@@ -287,14 +369,16 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
               setIsRaceAvailable(false);
               handleStartCar(car.id, car.name, car.color);
             }}
-            disabled={(!!carsStatus[car.id] && carsStatus[car.id].status.includes('driving'))}
-          >start
+            disabled={!!carsStatus[car.id] && carsStatus[car.id].status.includes('driving')}
+          >
+            start
           </button>
           <button
             type="button"
             onClick={() => handleStopCar(car.id)}
-            disabled={(!carsStatus[car.id] || carsStatus[car.id].status.includes('stopped'))}
-          >stop
+            disabled={!carsStatus[car.id] || carsStatus[car.id].status.includes('stopped')}
+          >
+            stop
           </button>
           {/* <span id={`car_id_${car.id}_info`}>{
             carsStatus[car.id] ? carsStatus[car.id].status : 'status: parked '
@@ -311,7 +395,8 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
             handleStopAllCars();
           }}
           disabled={(!isRaceAvailable && !isResetAvailable) || currentPage === 1}
-        >-
+        >
+          -
         </button>
         <div className={styles.pagination__number}>{currentPage}</div>
         <button
@@ -321,9 +406,11 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
             handlePagination(currentPage + 1);
             handleStopAllCars();
           }}
-          disabled={(!isRaceAvailable && !isResetAvailable) ||
-            currentPage === getAvailableMaxPages(totalCars, CARS_PER_PAGE)}
-        >+
+          disabled={
+            (!isRaceAvailable && !isResetAvailable) || currentPage === getAvailableMaxPages(totalCars, CARS_PER_PAGE)
+          }
+        >
+          +
         </button>
       </div>
       <div className={styles.popup} hidden={!isWinnerPopUpActive}>
@@ -336,7 +423,8 @@ export function Garage({ isGarageShown, totalCars, setTotalCars, isRaceAvailable
           type="button"
           onClick={() => handleStopAllCars()}
           disabled={!isResetAvailable}
-        >reset
+        >
+          reset
         </button>
       </div>
     </div>

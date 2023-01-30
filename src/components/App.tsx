@@ -13,10 +13,7 @@ function App() {
 
   return (
     <div className={styles.wrapper}>
-      <Header
-        isGarageShown={isGarageShown}
-        setIsGarageShown={setIsGarageShown}
-      />
+      <Header isGarageShown={isGarageShown} setIsGarageShown={setIsGarageShown} />
       <Garage
         isGarageShown={isGarageShown}
         totalCars={totalCars}

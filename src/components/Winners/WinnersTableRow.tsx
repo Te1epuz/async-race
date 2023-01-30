@@ -4,7 +4,7 @@ import styles from './WinnersTableRow.module.scss';
 type TProps = {
   winner: TWinner;
   carsData: TWinnersData;
-}
+};
 
 export function WinnersTableRow({ winner, carsData }: TProps) {
   return (

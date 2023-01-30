@@ -4,7 +4,7 @@ import { TWinner, TCar } from '../types/types';
 export async function getWinner(id: number) {
   const response = await fetch(`${BASE_URL}/winners/${id}`);
   if (response.status === 200) {
-    const data: TWinner = await response.json();
+    const data = (await response.json()) as TWinner;
     return data;
   }
   if (response.status === 404) {
@@ -14,14 +14,13 @@ export async function getWinner(id: number) {
 }
 
 async function fetchGetAllWinnersList() {
-  const response = await fetch(
-    `${BASE_URL}/winners?_page=1&_limit=999&_sort=id&_order=ASC`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  const allWinnersData = await response.json();
+  const response = await fetch(`${BASE_URL}/winners?_page=1&_limit=999&_sort=id&_order=ASC`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  const allWinnersData = (await response.json()) as TWinner[];
   return allWinnersData;
 }
 
@@ -69,7 +68,7 @@ export async function deleteWinner(id: number) {
 
 export async function getCar(id: number) {
   const response = await fetch(`${BASE_URL}/garage/${id}`);
-  const data: TCar = await response.json();
+  const data = (await response.json()) as TCar;
   return data;
 }
 
@@ -78,16 +77,21 @@ export async function fetchGetGarage(currentPage: number) {
   return response;
 }
 
-export async function fetchGetWinnersList(currentWinnersPage: number,
-  sortWinnersBy: 'time' | 'wins' | 'id', sortWinnersDirection: 'ASC' | 'DESC') {
+export async function fetchGetWinnersList(
+  currentWinnersPage: number,
+  sortWinnersBy: 'time' | 'wins' | 'id',
+  sortWinnersDirection: 'ASC' | 'DESC',
+) {
   const response = await fetch(
-    `${BASE_URL}/winners?_page=${currentWinnersPage}&_limit=${WINNERS_PER_PAGE}&_sort=${
-      sortWinnersBy}&_order=${sortWinnersDirection}`, {
+    // eslint-disable-next-line max-len
+    `${BASE_URL}/winners?_page=${currentWinnersPage}&_limit=${WINNERS_PER_PAGE}&_sort=${sortWinnersBy}&_order=${sortWinnersDirection}`,
+    {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-    });
+    },
+  );
   return response;
 }
 

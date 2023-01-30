@@ -4,9 +4,19 @@
     "es2021": true,
     "jest": true
   },
-  "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:@typescript-eslint/recommended", "airbnb"],
-  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "airbnb",
+    "airbnb-base",
+    "airbnb-typescript/base",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking"
+  ],
   "parserOptions": {
+    "project": "./tsconfig.json",
     "ecmaFeatures": {
       "jsx": true
     },
@@ -28,6 +38,8 @@
     "react/react-in-jsx-scope": "off",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", "ts", "tsx"] }],
     "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/no-misused-promises": "off",
     "implicit-arrow-linebreak": "off",
     "object-curly-newline": "off",
     "react/jsx-one-expression-per-line": "off",
@@ -39,7 +51,8 @@
     "react/jsx-props-no-spreading": "off",
     "@typescript-eslint/no-unused-vars": "warn",
     "no-return-assign": "off",
-    "no-param-reassign": "off"
+    "no-param-reassign": "off",
+    "no-void": "off"
     // "no-unused-vars": "off"
   },
   "settings": {

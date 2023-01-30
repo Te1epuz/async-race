@@ -10,19 +10,26 @@ type TProps = {
   setSortWinnersBy: React.Dispatch<React.SetStateAction<'time' | 'wins' | 'id'>>;
   sortWinnersDirection: 'ASC' | 'DESC';
   setSortWinnersDirection: React.Dispatch<React.SetStateAction<'ASC' | 'DESC'>>;
-}
+};
 
-export function WinnersTable({ winnersList, sortWinnersBy, setSortWinnersBy,
-  sortWinnersDirection, setSortWinnersDirection }: TProps) {
+export function WinnersTable({
+  winnersList,
+  sortWinnersBy,
+  setSortWinnersBy,
+  sortWinnersDirection,
+  setSortWinnersDirection,
+}: TProps) {
   const [carsData, setCarsData] = useState<TWinnersData>({});
 
   async function getCarData(id: number) {
     const data: TCar = await getCar(id);
-    setCarsData((prev) => ({ ...prev,
+    setCarsData((prev) => ({
+      ...prev,
       [id]: {
         name: data.name,
         color: data.color,
-      } }));
+      },
+    }));
   }
 
   function handleChangeSortBy(sortBy: 'time' | 'wins' | 'id') {
@@ -45,33 +52,29 @@ export function WinnersTable({ winnersList, sortWinnersBy, setSortWinnersBy,
     <table className={styles.table}>
       <thead>
         <tr>
-          <th
-            className={styles.header__clickable}
-            onClick={() => handleChangeSortBy('id')}
-          >#{sortWinnersBy === 'id' ? sortWinnersDirection === 'ASC' ? '▾' : '▴' : ''}
+          <th className={styles.header__clickable} onClick={() => handleChangeSortBy('id')}>
+            #{sortWinnersBy === 'id' ? (sortWinnersDirection === 'ASC' ? '▾' : '▴') : ''}
           </th>
           <th>Car</th>
           <th>Name</th>
-          <th
-            className={styles.header__clickable}
-            onClick={() => handleChangeSortBy('wins')}
-          >Wins{sortWinnersBy === 'wins' ? sortWinnersDirection === 'ASC' ? '▾' : '▴' : ''}
+          <th className={styles.header__clickable} onClick={() => handleChangeSortBy('wins')}>
+            Wins{sortWinnersBy === 'wins' ? (sortWinnersDirection === 'ASC' ? '▾' : '▴') : ''}
           </th>
-          <th
-            className={styles.header__clickable}
-            onClick={() => handleChangeSortBy('time')}
-          >Best time{sortWinnersBy === 'time' ? sortWinnersDirection === 'ASC' ? '▾' : '▴' : ''}
+          <th className={styles.header__clickable} onClick={() => handleChangeSortBy('time')}>
+            Best time{sortWinnersBy === 'time' ? (sortWinnersDirection === 'ASC' ? '▾' : '▴') : ''}
           </th>
         </tr>
       </thead>
       <tbody>
-        {winnersList.length === 0 ? <tr><td colSpan={5}>No winners to display :(</td></tr> : ''}
+        {winnersList.length === 0 ? (
+          <tr>
+            <td colSpan={5}>No winners to display :(</td>
+          </tr>
+        ) : (
+          ''
+        )}
         {winnersList.map((winner: TWinner) => (
-          <WinnersTableRow
-            key={winner.id}
-            winner={winner}
-            carsData={carsData}
-          />
+          <WinnersTableRow key={winner.id} winner={winner} carsData={carsData} />
         ))}
       </tbody>
     </table>
